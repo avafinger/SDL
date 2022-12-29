@@ -1,0 +1,21 @@
+Source: sdl3
+Priority: optional
+Maintainer: Alexander Finger<alex.mobigo@gmail.com>
+Build-Depends: debhelper (>= 9), cmake
+Standards-Version: 3.0.0
+Section: libs
+Homepage: https://github.com/libsdl-org/SDL
+Description: Simple DirectMedia Layer 3
+ SDL3 is a library that allows programs portable low level access to a video
+ framebuffer, audio output, mouse, and keyboard.
+
+Package: libsdl3-dev
+Section: libdevel
+Architecture: any
+Depends: libsdl3 (= ${binary:Version}), ${misc:Depends}
+Description: Simple DirectMedia 3 dev-headers
+
+Package: libsdl3
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Simple DirectMedia 3 library
