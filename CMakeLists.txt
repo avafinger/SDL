@@ -2904,6 +2904,29 @@ else()
   set(PKGCONFIG_LIBS_PRIV "")
 endif()
 
+set(prefix ${CMAKE_INSTALL_PREFIX})
+set(exec_prefix "\${prefix}")
+set(libdir "\${exec_prefix}/lib/${CMAKE_INSTALL_LIBDIR}")
+set(bindir "\${exec_prefix}/bin")
+set(includedir "\${prefix}/include")
+if(SDL_STATIC)
+  set(ENABLE_STATIC_TRUE "")
+  set(ENABLE_STATIC_FALSE "#")
+else()
+  set(ENABLE_STATIC_TRUE "#")
+  set(ENABLE_STATIC_FALSE "")
+endif()
+if(SDL_SHARED)
+  set(PKG_CONFIG_LIBS_PRIV "
+Libs.private:")
+  set(ENABLE_SHARED_TRUE "")
+  set(ENABLE_SHARED_FALSE "#")
+else()
+  set(PKG_CONFIG_LIBS_PRIV "")
+  set(ENABLE_SHARED_TRUE "#")
+  set(ENABLE_SHARED_FALSE "")
+endif()
+
 # Clean up the different lists
 listtostr(EXTRA_LIBS _EXTRA_LIBS "-l")
 set(SDL_STATIC_LIBS ${EXTRA_LDFLAGS} ${_EXTRA_LIBS})
@@ -2927,6 +2950,9 @@ endif()
 # MESSAGE(STATUS "SDL_STATIC_LIBS: ${SDL_STATIC_LIBS}")
 
 configure_file(cmake/sdl3.pc.in sdl3.pc @ONLY)
+configure_file("${SDL3_SOURCE_DIR}/sdl3-config.in"
+    "${SDL3_BINARY_DIR}/sdl3-config")
+
 
 macro(check_add_debug_flag FLAG SUFFIX)
     check_c_compiler_flag(${FLAG} HAS_C_FLAG_${SUFFIX})
@@ -3341,6 +3367,7 @@ if(NOT SDL3_DISABLE_INSTALL)
     install(FILES ${SDL3_BINARY_DIR}/sdl3.pc
             DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
   endif()
+  install(PROGRAMS ${SDL3_BINARY_DIR}/sdl3-config DESTINATION bin)
 endif()
 
 ##### Uninstall target #####

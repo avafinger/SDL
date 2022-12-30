@@ -1,0 +1,38 @@
+# sdl3 cmake project-config input for ./configure scripts
+
+set(prefix "@prefix@") 
+set(exec_prefix "@exec_prefix@")
+set(libdir "@libdir@")
+set(SDL3_PREFIX "@prefix@")
+set(SDL3_EXEC_PREFIX "@prefix@")
+set(SDL3_INCLUDE_DIRS "@includedir@/SDL3")
+set(SDL3_LIBRARIES "@SDL_RLD_FLAGS@ @SDL_LIBS@")
+string(STRIP "${SDL3_LIBRARIES}" SDL3_LIBRARIES)
+
+if(NOT TARGET SDL3::SDL3)
+  # Remove -lSDL3 as that is handled by CMake, note the space at the end so it does not replace e.g. -lSDL3main
+  # This may require "libdir" beeing set (from above)
+  string(REPLACE "-lSDL3 " "" SDL3_EXTRA_LINK_FLAGS "@SDL_RLD_FLAGS@ @SDL_LIBS@ ")
+  string(STRIP "${SDL3_EXTRA_LINK_FLAGS}" SDL3_EXTRA_LINK_FLAGS)
+  string(REPLACE "-lSDL3 " "" SDL3_EXTRA_LINK_FLAGS_STATIC "@SDL_STATIC_LIBS@ ")
+  string(STRIP "${SDL3_EXTRA_LINK_FLAGS_STATIC}" SDL3_EXTRA_LINK_FLAGS_STATIC)
+
+  add_library(SDL3::SDL3 SHARED IMPORTED)
+  set_target_properties(SDL3::SDL3 PROPERTIES
+    INTERFACE_INCLUDE_DIRECTORIES "@includedir@/SDL3"
+    IMPORTED_LINK_INTERFACE_LANGUAGES "C"
+    IMPORTED_LOCATION "@libdir@/${CMAKE_SHARED_LIBRARY_PREFIX}SDL3${CMAKE_SHARED_LIBRARY_SUFFIX}"
+    INTERFACE_LINK_LIBRARIES "${SDL3_EXTRA_LINK_FLAGS}")
+
+  add_library(SDL3::SDL3-static STATIC IMPORTED)
+  set_target_properties(SDL3::SDL3-static PROPERTIES
+    INTERFACE_INCLUDE_DIRECTORIES "@includedir@/SDL3"
+    IMPORTED_LINK_INTERFACE_LANGUAGES "C"
+    IMPORTED_LOCATION "@libdir@/${CMAKE_STATIC_LIBRARY_PREFIX}SDL3${CMAKE_STATIC_LIBRARY_SUFFIX}"
+    INTERFACE_LINK_LIBRARIES "${SDL3_EXTRA_LINK_FLAGS_STATIC}")
+
+  add_library(SDL3::SDL3main STATIC IMPORTED)
+  set_target_properties(SDL3::SDL3main PROPERTIES
+    IMPORTED_LINK_INTERFACE_LANGUAGES "C"
+    IMPORTED_LOCATION "@libdir@/${CMAKE_STATIC_LIBRARY_PREFIX}SDL3main${CMAKE_STATIC_LIBRARY_SUFFIX}")
+endif()
