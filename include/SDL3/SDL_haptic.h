@@ -137,8 +137,8 @@ extern "C" {
  *  \sa SDL_HapticOpenFromJoystick
  *  \sa SDL_HapticClose
  */
-struct _SDL_Haptic;
-typedef struct _SDL_Haptic SDL_Haptic;
+struct SDL_Haptic;
+typedef struct SDL_Haptic SDL_Haptic;
 
 
 /**
@@ -1337,5 +1337,3 @@ extern DECLSPEC int SDLCALL SDL_HapticRumbleStop(SDL_Haptic * haptic);
 #include <SDL3/SDL_close_code.h>
 
 #endif /* SDL_haptic_h_ */
-
-/* vi: set ts=4 sw=4 expandtab: */

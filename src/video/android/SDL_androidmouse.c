@@ -92,7 +92,7 @@ static SDL_Cursor *Android_CreateCursor(SDL_Surface *surface, int hot_x, int hot
         return NULL;
     }
     custom_cursor = Android_JNI_CreateCustomCursor(converted, hot_x, hot_y);
-    SDL_FreeSurface(converted);
+    SDL_DestroySurface(converted);
     if (!custom_cursor) {
         SDL_Unsupported();
         return NULL;
@@ -122,7 +122,7 @@ static SDL_Cursor *Android_CreateEmptyCursor()
         if (empty_surface) {
             SDL_memset(empty_surface->pixels, 0, (size_t)empty_surface->h * empty_surface->pitch);
             empty_cursor = Android_CreateCursor(empty_surface, 0, 0);
-            SDL_FreeSurface(empty_surface);
+            SDL_DestroySurface(empty_surface);
         }
     }
     return empty_cursor;
@@ -251,5 +251,3 @@ void Android_OnMouse(SDL_Window *window, int state, int action, float x, float y
 }
 
 #endif /* SDL_VIDEO_DRIVER_ANDROID */
-
-/* vi: set ts=4 sw=4 expandtab: */

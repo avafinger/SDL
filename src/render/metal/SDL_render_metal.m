@@ -1252,7 +1252,7 @@ static SDL_bool SetDrawState(SDL_Renderer *renderer, const SDL_RenderCommand *cm
             METAL_GetOutputSize(renderer, &output.w, &output.h);
         }
 
-        if (SDL_IntersectRect(&output, &clip, &clip)) {
+        if (SDL_GetRectIntersection(&output, &clip, &clip)) {
             MTLScissorRect mtlrect;
             mtlrect.x = clip.x;
             mtlrect.y = clip.y;
@@ -1988,5 +1988,3 @@ SDL_RenderDriver METAL_RenderDriver = {
 };
 
 #endif /* SDL_VIDEO_RENDER_METAL && !SDL_RENDER_DISABLED */
-
-/* vi: set ts=4 sw=4 expandtab: */

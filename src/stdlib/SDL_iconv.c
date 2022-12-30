@@ -106,7 +106,7 @@ enum
 #define ENCODING_UCS4NATIVE  ENCODING_UCS4LE
 #endif
 
-struct _SDL_iconv_t
+struct SDL_iconv_data_t
 {
     int src_fmt;
     int dst_fmt;
@@ -855,5 +855,3 @@ SDL_iconv_string(const char *tocode, const char *fromcode, const char *inbuf,
 
     return string;
 }
-
-/* vi: set ts=4 sw=4 expandtab: */

@@ -1565,7 +1565,7 @@ void SDL_UnRLESurface(SDL_Surface *surface, int recode)
                 surface->flags |= SDL_SIMD_ALIGNED;
 
                 /* fill it with the background color */
-                SDL_FillRect(surface, NULL, surface->map->info.colorkey);
+                SDL_FillSurfaceRect(surface, NULL, surface->map->info.colorkey);
 
                 /* now render the encoded surface */
                 full.x = full.y = 0;
@@ -1589,5 +1589,3 @@ void SDL_UnRLESurface(SDL_Surface *surface, int recode)
 }
 
 #endif /* SDL_HAVE_RLE */
-
-/* vi: set ts=4 sw=4 expandtab: */

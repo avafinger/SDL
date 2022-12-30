@@ -32,7 +32,7 @@ static const char *video_usage[] = {
     "[--min-geometry WxH]", "[--max-geometry WxH]", "[--logical WxH]",
     "[--scale N]", "[--depth N]", "[--refresh R]", "[--vsync]", "[--noframe]",
     "[--resizable]", "[--minimize]", "[--maximize]", "[--grab]", "[--keyboard-grab]",
-    "[--shown]", "[--hidden]", "[--input-focus]", "[--mouse-focus]",
+    "[--hidden]", "[--input-focus]", "[--mouse-focus]",
     "[--flash-on-focus-loss]", "[--allow-highdpi]", "[--confine-cursor X,Y,W,H]",
     "[--usable-bounds]"
 };
@@ -453,10 +453,6 @@ int SDLTest_CommonArg(SDLTest_CommonState *state, int index)
         state->window_flags |= SDL_WINDOW_MAXIMIZED;
         return 1;
     }
-    if (SDL_strcasecmp(argv[index], "--shown") == 0) {
-        state->window_flags |= SDL_WINDOW_SHOWN;
-        return 1;
-    }
     if (SDL_strcasecmp(argv[index], "--hidden") == 0) {
         state->window_flags |= SDL_WINDOW_HIDDEN;
         return 1;
@@ -690,9 +686,6 @@ static void SDLTest_PrintWindowFlag(char *text, size_t maxlen, Uint32 flag)
     case SDL_WINDOW_OPENGL:
         SDL_snprintfcat(text, maxlen, "OPENGL");
         break;
-    case SDL_WINDOW_SHOWN:
-        SDL_snprintfcat(text, maxlen, "SHOWN");
-        break;
     case SDL_WINDOW_HIDDEN:
         SDL_snprintfcat(text, maxlen, "HIDDEN");
         break;
@@ -764,7 +757,6 @@ static void SDLTest_PrintWindowFlags(char *text, size_t maxlen, Uint32 flags)
     const Uint32 window_flags[] = {
         SDL_WINDOW_FULLSCREEN,
         SDL_WINDOW_OPENGL,
-        SDL_WINDOW_SHOWN,
         SDL_WINDOW_HIDDEN,
         SDL_WINDOW_BORDERLESS,
         SDL_WINDOW_RESIZABLE,
@@ -997,7 +989,7 @@ static SDL_Surface *SDLTest_LoadIcon(const char *file)
 
     if (icon->format->palette) {
         /* Set the colorkey */
-        SDL_SetColorKey(icon, 1, *((Uint8 *)icon->pixels));
+        SDL_SetSurfaceColorKey(icon, 1, *((Uint8 *)icon->pixels));
     }
 
     return icon;
@@ -1071,7 +1063,8 @@ SDLTest_CommonInit(SDLTest_CommonState *state)
                 SDL_Log("%s\n", text);
             }
         }
-        if (SDL_VideoInit(state->videodriver) < 0) {
+        SDL_SetHint("SDL_VIDEO_DRIVER", state->videodriver);
+        if (SDL_InitSubSystem(SDL_INIT_VIDEO) < 0) {
             SDL_Log("Couldn't initialize video driver: %s\n",
                     SDL_GetError());
             return SDL_FALSE;
@@ -1142,7 +1135,7 @@ SDLTest_CommonInit(SDLTest_CommonState *state)
                 SDL_Log("DPI: %fx%f\n", hdpi, vdpi);
 
                 SDL_GetDesktopDisplayMode(i, &mode);
-                SDL_PixelFormatEnumToMasks(mode.format, &bpp, &Rmask, &Gmask,
+                SDL_GetMasksForPixelFormatEnum(mode.format, &bpp, &Rmask, &Gmask,
                                            &Bmask, &Amask);
                 SDL_Log("  Current mode: %dx%d@%dHz, %d bits-per-pixel (%s)\n",
                         mode.w, mode.h, mode.refresh_rate, bpp,
@@ -1164,7 +1157,7 @@ SDLTest_CommonInit(SDLTest_CommonState *state)
                     SDL_Log("  Fullscreen video modes:\n");
                     for (j = 0; j < m; ++j) {
                         SDL_GetDisplayMode(i, j, &mode);
-                        SDL_PixelFormatEnumToMasks(mode.format, &bpp, &Rmask,
+                        SDL_GetMasksForPixelFormatEnum(mode.format, &bpp, &Rmask,
                                                    &Gmask, &Bmask, &Amask);
                         SDL_Log("    Mode %d: %dx%d@%dHz, %d bits-per-pixel (%s)\n",
                                 j, mode.w, mode.h, mode.refresh_rate, bpp,
@@ -1296,7 +1289,7 @@ SDLTest_CommonInit(SDLTest_CommonState *state)
                 SDL_Surface *icon = SDLTest_LoadIcon(state->window_icon);
                 if (icon) {
                     SDL_SetWindowIcon(state->windows[i], icon);
-                    SDL_FreeSurface(icon);
+                    SDL_DestroySurface(icon);
                 }
             }
 
@@ -1315,9 +1308,9 @@ SDLTest_CommonInit(SDLTest_CommonState *state)
                     return SDL_FALSE;
                 }
                 if (state->logical_w && state->logical_h) {
-                    SDL_RenderSetLogicalSize(state->renderers[i], state->logical_w, state->logical_h);
+                    SDL_SetRenderLogicalSize(state->renderers[i], state->logical_w, state->logical_h);
                 } else if (state->scale != 0.) {
-                    SDL_RenderSetScale(state->renderers[i], state->scale, state->scale);
+                    SDL_SetRenderScale(state->renderers[i], state->scale, state->scale);
                 }
                 if (state->verbose & VERBOSE_RENDER) {
                     SDL_RendererInfo info;
@@ -1346,7 +1339,8 @@ SDLTest_CommonInit(SDLTest_CommonState *state)
                 SDL_Log("%s\n", text);
             }
         }
-        if (SDL_AudioInit(state->audiodriver) < 0) {
+        SDL_SetHint("SDL_AUDIO_DRIVER", state->audiodriver);
+        if (SDL_InitSubSystem(SDL_INIT_AUDIO) < 0) {
             SDL_Log("Couldn't initialize audio driver: %s\n",
                     SDL_GetError());
             return SDL_FALSE;
@@ -1382,30 +1376,30 @@ static const char *DisplayOrientationName(int orientation)
     }
 }
 
-static const char *ControllerAxisName(const SDL_GameControllerAxis axis)
+static const char *GamepadAxisName(const SDL_GamepadAxis axis)
 {
     switch (axis) {
 #define AXIS_CASE(ax)              \
-    case SDL_CONTROLLER_AXIS_##ax: \
+    case SDL_GAMEPAD_AXIS_##ax: \
         return #ax
         AXIS_CASE(INVALID);
         AXIS_CASE(LEFTX);
         AXIS_CASE(LEFTY);
         AXIS_CASE(RIGHTX);
         AXIS_CASE(RIGHTY);
-        AXIS_CASE(TRIGGERLEFT);
-        AXIS_CASE(TRIGGERRIGHT);
+        AXIS_CASE(LEFT_TRIGGER);
+        AXIS_CASE(RIGHT_TRIGGER);
 #undef AXIS_CASE
     default:
         return "???";
     }
 }
 
-static const char *ControllerButtonName(const SDL_GameControllerButton button)
+static const char *GamepadButtonName(const SDL_GamepadButton button)
 {
     switch (button) {
 #define BUTTON_CASE(btn)              \
-    case SDL_CONTROLLER_BUTTON_##btn: \
+    case SDL_GAMEPAD_BUTTON_##btn: \
         return #btn
         BUTTON_CASE(INVALID);
         BUTTON_CASE(A);
@@ -1415,10 +1409,10 @@ static const char *ControllerButtonName(const SDL_GameControllerButton button)
         BUTTON_CASE(BACK);
         BUTTON_CASE(GUIDE);
         BUTTON_CASE(START);
-        BUTTON_CASE(LEFTSTICK);
-        BUTTON_CASE(RIGHTSTICK);
-        BUTTON_CASE(LEFTSHOULDER);
-        BUTTON_CASE(RIGHTSHOULDER);
+        BUTTON_CASE(LEFT_STICK);
+        BUTTON_CASE(RIGHT_STICK);
+        BUTTON_CASE(LEFT_SHOULDER);
+        BUTTON_CASE(RIGHT_SHOULDER);
         BUTTON_CASE(DPAD_UP);
         BUTTON_CASE(DPAD_DOWN);
         BUTTON_CASE(DPAD_LEFT);
@@ -1554,11 +1548,11 @@ static void SDLTest_PrintEvent(SDL_Event *event)
                 event->wheel.x, event->wheel.y, event->wheel.direction, event->wheel.windowID);
         break;
     case SDL_JOYDEVICEADDED:
-        SDL_Log("SDL EVENT: Joystick index %" SDL_PRIs32 " attached",
+        SDL_Log("SDL EVENT: Joystick index %" SDL_PRIu32 " attached",
                 event->jdevice.which);
         break;
     case SDL_JOYDEVICEREMOVED:
-        SDL_Log("SDL EVENT: Joystick %" SDL_PRIs32 " removed",
+        SDL_Log("SDL EVENT: Joystick %" SDL_PRIu32 " removed",
                 event->jdevice.which);
         break;
     case SDL_JOYHATMOTION:
@@ -1593,41 +1587,41 @@ static void SDLTest_PrintEvent(SDL_Event *event)
             position = "LEFTUP";
             break;
         }
-        SDL_Log("SDL EVENT: Joystick %" SDL_PRIs32 ": hat %d moved to %s",
+        SDL_Log("SDL EVENT: Joystick %" SDL_PRIu32 ": hat %d moved to %s",
                 event->jhat.which, event->jhat.hat, position);
     } break;
     case SDL_JOYBUTTONDOWN:
-        SDL_Log("SDL EVENT: Joystick %" SDL_PRIs32 ": button %d pressed",
+        SDL_Log("SDL EVENT: Joystick %" SDL_PRIu32 ": button %d pressed",
                 event->jbutton.which, event->jbutton.button);
         break;
     case SDL_JOYBUTTONUP:
-        SDL_Log("SDL EVENT: Joystick %" SDL_PRIs32 ": button %d released",
+        SDL_Log("SDL EVENT: Joystick %" SDL_PRIu32 ": button %d released",
                 event->jbutton.which, event->jbutton.button);
         break;
-    case SDL_CONTROLLERDEVICEADDED:
-        SDL_Log("SDL EVENT: Controller index %" SDL_PRIs32 " attached",
+    case SDL_GAMEPADADDED:
+        SDL_Log("SDL EVENT: Gamepad index %" SDL_PRIu32 " attached",
                 event->cdevice.which);
         break;
-    case SDL_CONTROLLERDEVICEREMOVED:
-        SDL_Log("SDL EVENT: Controller %" SDL_PRIs32 " removed",
+    case SDL_GAMEPADREMOVED:
+        SDL_Log("SDL EVENT: Gamepad %" SDL_PRIu32 " removed",
                 event->cdevice.which);
         break;
-    case SDL_CONTROLLERAXISMOTION:
-        SDL_Log("SDL EVENT: Controller %" SDL_PRIs32 " axis %d ('%s') value: %d",
+    case SDL_GAMEPADAXISMOTION:
+        SDL_Log("SDL EVENT: Gamepad %" SDL_PRIu32 " axis %d ('%s') value: %d",
                 event->caxis.which,
                 event->caxis.axis,
-                ControllerAxisName((SDL_GameControllerAxis)event->caxis.axis),
+                GamepadAxisName((SDL_GamepadAxis)event->caxis.axis),
                 event->caxis.value);
         break;
-    case SDL_CONTROLLERBUTTONDOWN:
-        SDL_Log("SDL EVENT: Controller %" SDL_PRIs32 "button %d ('%s') down",
+    case SDL_GAMEPADBUTTONDOWN:
+        SDL_Log("SDL EVENT: Gamepad %" SDL_PRIu32 "button %d ('%s') down",
                 event->cbutton.which, event->cbutton.button,
-                ControllerButtonName((SDL_GameControllerButton)event->cbutton.button));
+                GamepadButtonName((SDL_GamepadButton)event->cbutton.button));
         break;
-    case SDL_CONTROLLERBUTTONUP:
-        SDL_Log("SDL EVENT: Controller %" SDL_PRIs32 " button %d ('%s') up",
+    case SDL_GAMEPADBUTTONUP:
+        SDL_Log("SDL EVENT: Gamepad %" SDL_PRIu32 " button %d ('%s') up",
                 event->cbutton.which, event->cbutton.button,
-                ControllerButtonName((SDL_GameControllerButton)event->cbutton.button));
+                GamepadButtonName((SDL_GamepadButton)event->cbutton.button));
         break;
     case SDL_CLIPBOARDUPDATE:
         SDL_Log("SDL EVENT: Clipboard updated");
@@ -1708,7 +1702,7 @@ static void SDLTest_ScreenShot(SDL_Renderer *renderer)
         return;
     }
 
-    SDL_RenderGetViewport(renderer, &viewport);
+    SDL_GetRenderViewport(renderer, &viewport);
 
     surface = SDL_CreateSurface(viewport.w, viewport.h, SDL_PIXELFORMAT_BGR24);
 
@@ -1918,15 +1912,15 @@ void SDLTest_CommonEvent(SDLTest_CommonState *state, SDL_Event *event, int *done
                     if (state->renderers[i]) {
                         SDL_Rect clip;
                         SDL_GetWindowSize(state->windows[i], &w, &h);
-                        SDL_RenderGetClipRect(state->renderers[i], &clip);
+                        SDL_GetRenderClipRect(state->renderers[i], &clip);
                         if (SDL_RectEmpty(&clip)) {
                             clip.x = w / 4;
                             clip.y = h / 4;
                             clip.w = w / 2;
                             clip.h = h / 2;
-                            SDL_RenderSetClipRect(state->renderers[i], &clip);
+                            SDL_SetRenderClipRect(state->renderers[i], &clip);
                         } else {
-                            SDL_RenderSetClipRect(state->renderers[i], NULL);
+                            SDL_SetRenderClipRect(state->renderers[i], NULL);
                         }
                     }
                 }
@@ -2160,10 +2154,10 @@ void SDLTest_CommonQuit(SDLTest_CommonState *state)
         SDL_free(state->renderers);
     }
     if (state->flags & SDL_INIT_VIDEO) {
-        SDL_VideoQuit();
+        SDL_QuitSubSystem(SDL_INIT_VIDEO);
     }
     if (state->flags & SDL_INIT_AUDIO) {
-        SDL_AudioQuit();
+        SDL_QuitSubSystem(SDL_INIT_AUDIO);
     }
     SDL_free(state);
     SDL_Quit();
@@ -2216,20 +2210,20 @@ void SDLTest_CommonDrawWindowInfo(SDL_Renderer *renderer, SDL_Window *window, in
         textY += lineHeight;
     }
 
-    SDL_RenderGetViewport(renderer, &rect);
-    (void)SDL_snprintf(text, sizeof text, "SDL_RenderGetViewport: %d,%d, %dx%d",
+    SDL_GetRenderViewport(renderer, &rect);
+    (void)SDL_snprintf(text, sizeof text, "SDL_GetRenderViewport: %d,%d, %dx%d",
                        rect.x, rect.y, rect.w, rect.h);
     SDLTest_DrawString(renderer, 0, textY, text);
     textY += lineHeight;
 
-    SDL_RenderGetScale(renderer, &scaleX, &scaleY);
-    (void)SDL_snprintf(text, sizeof text, "SDL_RenderGetScale: %f,%f",
+    SDL_GetRenderScale(renderer, &scaleX, &scaleY);
+    (void)SDL_snprintf(text, sizeof text, "SDL_GetRenderScale: %f,%f",
                        scaleX, scaleY);
     SDLTest_DrawString(renderer, 0, textY, text);
     textY += lineHeight;
 
-    SDL_RenderGetLogicalSize(renderer, &w, &h);
-    (void)SDL_snprintf(text, sizeof text, "SDL_RenderGetLogicalSize: %dx%d", w, h);
+    SDL_GetRenderLogicalSize(renderer, &w, &h);
+    (void)SDL_snprintf(text, sizeof text, "SDL_GetRenderLogicalSize: %dx%d", w, h);
     SDLTest_DrawString(renderer, 0, textY, text);
     textY += lineHeight;
 
@@ -2336,5 +2330,3 @@ void SDLTest_CommonDrawWindowInfo(SDL_Renderer *renderer, SDL_Window *window, in
         *usedHeight = textY;
     }
 }
-
-/* vi: set ts=4 sw=4 expandtab: */

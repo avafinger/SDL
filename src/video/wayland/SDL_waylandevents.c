@@ -374,7 +374,7 @@ int Wayland_WaitEventTimeout(_THIS, Sint64 timeoutNS)
     WAYLAND_wl_display_flush(d->display);
 
 #ifdef SDL_USE_IME
-    if (d->text_input_manager == NULL && SDL_GetEventState(SDL_TEXTINPUT) == SDL_ENABLE) {
+    if (d->text_input_manager == NULL && SDL_EventEnabled(SDL_TEXTINPUT)) {
         SDL_IME_PumpEvents();
     }
 #endif
@@ -443,7 +443,7 @@ void Wayland_PumpEvents(_THIS)
     int err;
 
 #ifdef SDL_USE_IME
-    if (d->text_input_manager == NULL && SDL_GetEventState(SDL_TEXTINPUT) == SDL_ENABLE) {
+    if (d->text_input_manager == NULL && SDL_EventEnabled(SDL_TEXTINPUT)) {
         SDL_IME_PumpEvents();
     }
 #endif
@@ -2838,5 +2838,3 @@ int Wayland_input_ungrab_keyboard(SDL_Window *window)
 }
 
 #endif /* SDL_VIDEO_DRIVER_WAYLAND */
-
-/* vi: set ts=4 sw=4 expandtab: */

@@ -199,7 +199,7 @@ void loop()
             }
             if (updateCursor) {
                 SDL_Log("Changing cursor to \"%s\"", cursorNames[system_cursor]);
-                SDL_FreeCursor(cursor);
+                SDL_DestroyCursor(cursor);
                 cursor = SDL_CreateSystemCursor((SDL_SystemCursor)system_cursor);
                 SDL_SetCursor(cursor);
             }
@@ -225,7 +225,7 @@ void loop()
             int y = 0;
             SDL_Rect viewport, menurect;
 
-            SDL_RenderGetViewport(renderer, &viewport);
+            SDL_GetRenderViewport(renderer, &viewport);
 
             SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
             SDL_RenderClear(renderer);
@@ -269,8 +269,8 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    SDL_EventState(SDL_DROPFILE, SDL_ENABLE);
-    SDL_EventState(SDL_DROPTEXT, SDL_ENABLE);
+    SDL_SetEventEnabled(SDL_DROPFILE, SDL_TRUE);
+    SDL_SetEventEnabled(SDL_DROPTEXT, SDL_TRUE);
 
     for (i = 0; i < state->num_windows; ++i) {
         SDL_Renderer *renderer = state->renderers[i];
@@ -287,11 +287,9 @@ int main(int argc, char *argv[])
         loop();
     }
 #endif
-    SDL_FreeCursor(cursor);
+    SDL_DestroyCursor(cursor);
 
     quit(0);
     /* keep the compiler happy ... */
     return 0;
 }
-
-/* vi: set ts=4 sw=4 expandtab: */

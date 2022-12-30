@@ -381,7 +381,7 @@ static SDL_bool AdjustCoordinatesForGrab(SDL_Window *window, int x, int y, CGPoi
         window_rect.w = window->w;
         window_rect.h = window->h;
 
-        if (SDL_IntersectRect(&window->mouse_rect, &window_rect, &mouse_rect)) {
+        if (SDL_GetRectIntersection(&window->mouse_rect, &window_rect, &mouse_rect)) {
             int left = window->x + mouse_rect.x;
             int right = left + mouse_rect.w - 1;
             int top = window->y + mouse_rect.y;
@@ -428,7 +428,7 @@ static void Cocoa_UpdateClipCursor(SDL_Window *window)
             window_rect.h = window->h;
 
             if (window->mouse_rect.w > 0 && window->mouse_rect.h > 0) {
-                SDL_IntersectRect(&window->mouse_rect, &window_rect, &mouse_rect);
+                SDL_GetRectIntersection(&window->mouse_rect, &window_rect, &mouse_rect);
             }
 
             if ((window->flags & SDL_WINDOW_MOUSE_GRABBED) != 0 &&
@@ -1082,7 +1082,7 @@ static void Cocoa_UpdateClipCursor(SDL_Window *window)
         [self windowDidResize:aNotification];
 
         /* FIXME: Why does the window get hidden? */
-        if (window->flags & SDL_WINDOW_SHOWN) {
+        if (!(window->flags & SDL_WINDOW_HIDDEN)) {
             Cocoa_ShowWindow(SDL_GetVideoDevice(), window);
         }
     }
@@ -1645,9 +1645,9 @@ static int SetupWindowData(_THIS, SDL_Window *window, NSWindow *nswindow, NSView
         [data.listener listen:data];
 
         if ([nswindow isVisible]) {
-            window->flags |= SDL_WINDOW_SHOWN;
+            window->flags &= ~SDL_WINDOW_HIDDEN;
         } else {
-            window->flags &= ~SDL_WINDOW_SHOWN;
+            window->flags |= SDL_WINDOW_HIDDEN;
         }
 
         {
@@ -2466,5 +2466,3 @@ int Cocoa_SetWindowOpacity(_THIS, SDL_Window *window, float opacity)
 }
 
 #endif /* SDL_VIDEO_DRIVER_COCOA */
-
-/* vi: set ts=4 sw=4 expandtab: */

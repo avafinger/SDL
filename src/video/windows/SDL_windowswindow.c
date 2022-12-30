@@ -378,9 +378,9 @@ static int SetupWindowData(_THIS, SDL_Window *window, HWND hwnd, HWND parent, SD
     {
         DWORD style = GetWindowLong(hwnd, GWL_STYLE);
         if (style & WS_VISIBLE) {
-            window->flags |= SDL_WINDOW_SHOWN;
+            window->flags &= ~SDL_WINDOW_HIDDEN;
         } else {
-            window->flags &= ~SDL_WINDOW_SHOWN;
+            window->flags |= SDL_WINDOW_HIDDEN;
         }
         if (style & WS_POPUP) {
             window->flags |= SDL_WINDOW_BORDERLESS;
@@ -1411,5 +1411,3 @@ int WIN_FlashWindow(_THIS, SDL_Window *window, SDL_FlashOperation operation)
 #endif /*!defined(__XBOXONE__) && !defined(__XBOXSERIES__)*/
 
 #endif /* SDL_VIDEO_DRIVER_WINDOWS */
-
-/* vi: set ts=4 sw=4 expandtab: */

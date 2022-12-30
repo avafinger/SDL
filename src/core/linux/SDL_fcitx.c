@@ -41,7 +41,7 @@
 
 #define DBUS_TIMEOUT 500
 
-typedef struct _FcitxClient
+typedef struct FcitxClient
 {
     SDL_DBusContext *dbus;
 
@@ -485,5 +485,3 @@ void SDL_Fcitx_PumpEvents(void)
         usleep(10);
     }
 }
-
-/* vi: set ts=4 sw=4 expandtab: */

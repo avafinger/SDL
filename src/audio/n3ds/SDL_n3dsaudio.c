@@ -311,7 +311,7 @@ static void FreePrivateData(_THIS)
 static int FindAudioFormat(_THIS)
 {
     SDL_bool found_valid_format = SDL_FALSE;
-    Uint16 test_format = SDL_FirstAudioFormat(this->spec.format);
+    Uint16 test_format = SDL_GetFirstAudioFormat(this->spec.format);
 
     while (!found_valid_format && test_format) {
         this->spec.format = test_format;
@@ -331,7 +331,7 @@ static int FindAudioFormat(_THIS)
             found_valid_format = SDL_TRUE;
             break;
         default:
-            test_format = SDL_NextAudioFormat();
+            test_format = SDL_GetNextAudioFormat();
             break;
         }
     }
@@ -340,5 +340,3 @@ static int FindAudioFormat(_THIS)
 }
 
 #endif /* SDL_AUDIO_DRIVER_N3DS */
-
-/* vi: set sts=4 ts=4 sw=4 expandtab: */

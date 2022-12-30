@@ -41,7 +41,7 @@
 #include <SDL3/SDL_error.h>
 #include <SDL3/SDL_events.h>
 #include <SDL3/SDL_filesystem.h>
-#include <SDL3/SDL_gamecontroller.h>
+#include <SDL3/SDL_gamepad.h>
 #include <SDL3/SDL_guid.h>
 #include <SDL3/SDL_haptic.h>
 #include <SDL3/SDL_hidapi.h>
@@ -79,5 +79,3 @@
 #include <SDL3/SDL_oldnames.h>
 
 #endif /* SDL_h_ */
-
-/* vi: set ts=4 sw=4 expandtab: */

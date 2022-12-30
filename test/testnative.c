@@ -44,7 +44,7 @@ static SDL_Rect *positions, *velocities;
 static void
 quit(int rc)
 {
-    SDL_VideoQuit();
+    SDL_Quit();
     if (native_window != NULL && factory != NULL) {
         factory->DestroyNativeWindow(native_window);
     }
@@ -59,7 +59,7 @@ void MoveSprites(SDL_Renderer *renderer, SDL_Texture *sprite)
     SDL_Rect *position, *velocity;
 
     /* Query the sizes */
-    SDL_RenderGetViewport(renderer, &viewport);
+    SDL_GetRenderViewport(renderer, &viewport);
     SDL_QueryTexture(sprite, NULL, NULL, &sprite_w, &sprite_h);
 
     /* Draw a gray background */
@@ -82,7 +82,7 @@ void MoveSprites(SDL_Renderer *renderer, SDL_Texture *sprite)
         }
 
         /* Blit the sprite onto the screen */
-        SDL_RenderCopy(renderer, sprite, NULL, position);
+        SDL_RenderTexture(renderer, sprite, NULL, position);
     }
 
     /* Update the screen! */
@@ -103,7 +103,7 @@ int main(int argc, char *argv[])
     /* Enable standard application logging */
     SDL_LogSetPriority(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO);
 
-    if (SDL_VideoInit(NULL) < 0) {
+    if (SDL_Init(SDL_INIT_VIDEO) < 0) {
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't initialize SDL video: %s\n",
                      SDL_GetError());
         exit(1);
@@ -198,5 +198,3 @@ int main(int argc, char *argv[])
 
     return 0; /* to prevent compiler warning */
 }
-
-/* vi: set ts=4 sw=4 expandtab: */

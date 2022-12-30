@@ -32,7 +32,7 @@ void DrawChessBoard()
     SDL_Rect rect, darea;
 
     /* Get the Size of drawing surface */
-    SDL_RenderGetViewport(renderer, &darea);
+    SDL_GetRenderViewport(renderer, &darea);
 
     for (; row < 8; row++) {
         column = row % 2;
@@ -132,5 +132,3 @@ int main(int argc, char *argv[])
     SDL_Quit();
     return 0;
 }
-
-/* vi: set ts=4 sw=4 expandtab: */

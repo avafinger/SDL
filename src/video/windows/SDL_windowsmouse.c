@@ -173,7 +173,7 @@ static SDL_Cursor *WIN_CreateBlankCursor()
     SDL_Surface *surface = SDL_CreateSurface(32, 32, SDL_PIXELFORMAT_ARGB8888);
     if (surface) {
         cursor = WIN_CreateCursor(surface, 0, 0);
-        SDL_FreeSurface(surface);
+        SDL_DestroySurface(surface);
     }
     return cursor;
 }
@@ -487,5 +487,3 @@ void WIN_UpdateMouseSystemScale()
 }
 
 #endif /* SDL_VIDEO_DRIVER_WINDOWS */
-
-/* vi: set ts=4 sw=4 expandtab: */
