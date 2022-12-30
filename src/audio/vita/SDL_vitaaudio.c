@@ -69,7 +69,7 @@ static int VITAAUD_OpenDevice(_THIS, const char *devname)
     }
     SDL_memset(this->hidden, 0, sizeof(*this->hidden));
 
-    for (test_format = SDL_FirstAudioFormat(this->spec.format); test_format; test_format = SDL_NextAudioFormat()) {
+    for (test_format = SDL_GetFirstAudioFormat(this->spec.format); test_format; test_format = SDL_GetNextAudioFormat()) {
         if (test_format == AUDIO_S16LSB) {
             this->spec.format = test_format;
             break;
@@ -214,5 +214,3 @@ AudioBootStrap VITAAUD_bootstrap = {
 };
 
 #endif /* SDL_AUDIO_DRIVER_VITA */
-
-/* vi: set ts=4 sw=4 expandtab: */

@@ -316,7 +316,7 @@ static HRESULT STDMETHODCALLTYPE IEventHandler_CRawGameControllerVtbl_InvokeAdde
             boolean wireless;
 
             if (wgi.gamepad_statics2 && SUCCEEDED(__x_ABI_CWindows_CGaming_CInput_CIGamepadStatics2_FromGameController(wgi.gamepad_statics2, gamecontroller, &gamepad)) && gamepad) {
-                type = SDL_JOYSTICK_TYPE_GAMECONTROLLER;
+                type = SDL_JOYSTICK_TYPE_GAMEPAD;
                 __x_ABI_CWindows_CGaming_CInput_CIGamepad_Release(gamepad);
             } else if (wgi.arcade_stick_statics2 && SUCCEEDED(__x_ABI_CWindows_CGaming_CInput_CIArcadeStickStatics2_FromGameController(wgi.arcade_stick_statics2, gamecontroller, &arcade_stick)) && arcade_stick) {
                 type = SDL_JOYSTICK_TYPE_ARCADE_STICK;
@@ -850,13 +850,13 @@ static void WGI_JoystickUpdate(SDL_Joystick *joystick)
             /* FIXME: What units are the timestamp we get from GetCurrentReading()? */
             timestamp = SDL_GetTicksNS();
             for (i = 0; i < nbuttons; ++i) {
-                SDL_PrivateJoystickButton(timestamp, joystick, (Uint8)i, buttons[i]);
+                SDL_SendJoystickButton(timestamp, joystick, (Uint8)i, buttons[i]);
             }
             for (i = 0; i < nhats; ++i) {
-                SDL_PrivateJoystickHat(timestamp, joystick, (Uint8)i, ConvertHatValue(hats[i]));
+                SDL_SendJoystickHat(timestamp, joystick, (Uint8)i, ConvertHatValue(hats[i]));
             }
             for (i = 0; i < naxes; ++i) {
-                SDL_PrivateJoystickAxis(timestamp, joystick, (Uint8)i, (Sint16)((int)(axes[i] * 65535) - 32768));
+                SDL_SendJoystickAxis(timestamp, joystick, (Uint8)i, (Sint16)((int)(axes[i] * 65535) - 32768));
             }
         }
     }
@@ -961,5 +961,3 @@ SDL_JoystickDriver SDL_WGI_JoystickDriver = {
 };
 
 #endif /* SDL_JOYSTICK_WGI */
-
-/* vi: set ts=4 sw=4 expandtab: */

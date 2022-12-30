@@ -2063,7 +2063,7 @@ static int WaveLoad(SDL_RWops *src, WaveFile *file, SDL_AudioSpec *spec, Uint8 *
         break;
     }
 
-    spec->silence = SDL_SilenceValueForFormat(spec->format);
+    spec->silence = SDL_GetSilenceValueForFormat(spec->format);
 
     /* Report the end position back to the cleanup code. */
     if (RIFFlengthknown) {
@@ -2124,13 +2124,3 @@ SDL_LoadWAV_RW(SDL_RWops *src, int freesrc, SDL_AudioSpec *spec, Uint8 **audio_b
 
     return spec;
 }
-
-/* Since the WAV memory is allocated in the shared library, it must also
-   be freed here.  (Necessary under Win32, VC++)
- */
-void SDL_FreeWAV(Uint8 *audio_buf)
-{
-    SDL_free(audio_buf);
-}
-
-/* vi: set ts=4 sw=4 expandtab: */

@@ -29,7 +29,7 @@
 #define MAX_CURSOR_W 512
 #define MAX_CURSOR_H 512
 
-typedef struct _KMSDRM_CursorData
+typedef struct KMSDRM_CursorData
 {
     int hot_x, hot_y;
     int w, h;
@@ -51,5 +51,3 @@ extern void KMSDRM_DestroyCursorBO(_THIS, SDL_VideoDisplay *display);
 extern void KMSDRM_InitCursor(void);
 
 #endif /* SDL_KMSDRM_mouse_h_ */
-
-/* vi: set ts=4 sw=4 expandtab: */

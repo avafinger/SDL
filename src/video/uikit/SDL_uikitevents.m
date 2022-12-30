@@ -320,7 +320,7 @@ static void OnGCMouseConnected(GCMouse *mouse) API_AVAILABLE(macos(11.0), ios(14
 
     mouse.mouseInput.mouseMovedHandler = ^(GCMouseInput *mouseInput, float deltaX, float deltaY) {
       if (SDL_GCMouseRelativeMode()) {
-          SDL_SendMouseMotion(0, SDL_GetMouseFocus(), mouseID, 1, (int)deltaX, -(int)deltaY);
+          SDL_SendMouseMotion(0, SDL_GetMouseFocus(), mouseID, 1, deltaX, -deltaY);
       }
     };
 
@@ -452,5 +452,3 @@ void SDL_QuitGCMouse(void)
 #endif /* ENABLE_GCMOUSE */
 
 #endif /* SDL_VIDEO_DRIVER_UIKIT */
-
-/* vi: set ts=4 sw=4 expandtab: */

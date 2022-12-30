@@ -258,7 +258,7 @@ static int SNDIO_OpenDevice(_THIS, const char *devname)
     par.appbufsz = par.round * 2;
 
     /* Try for a closest match on audio format */
-    for (test_format = SDL_FirstAudioFormat(this->spec.format); test_format; test_format = SDL_NextAudioFormat()) {
+    for (test_format = SDL_GetFirstAudioFormat(this->spec.format); test_format; test_format = SDL_GetNextAudioFormat()) {
         if (!SDL_AUDIO_ISFLOAT(test_format)) {
             par.le = SDL_AUDIO_ISLITTLEENDIAN(test_format) ? 1 : 0;
             par.sig = SDL_AUDIO_ISSIGNED(test_format) ? 1 : 0;
@@ -365,5 +365,3 @@ AudioBootStrap SNDIO_bootstrap = {
 };
 
 #endif /* SDL_AUDIO_DRIVER_SNDIO */
-
-/* vi: set ts=4 sw=4 expandtab: */

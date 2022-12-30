@@ -40,7 +40,9 @@ extern int WIN_InitModes(_THIS);
 extern int WIN_GetDisplayBounds(_THIS, SDL_VideoDisplay *display, SDL_Rect *rect);
 extern int WIN_GetDisplayUsableBounds(_THIS, SDL_VideoDisplay *display, SDL_Rect *rect);
 extern void WIN_ScreenPointFromSDL(int *x, int *y, int *dpiOut);
+extern void WIN_ScreenPointFromSDLFloat(float x, float y, LONG *xOut, LONG *yOut, int *dpiOut);
 extern void WIN_ScreenPointToSDL(int *x, int *y);
+extern void WIN_ScreenPointToSDLFloat(LONG x, LONG y, float *xOut, float *yOut);
 extern int WIN_GetDisplayDPI(_THIS, SDL_VideoDisplay *display, float *ddpi, float *hdpi, float *vdpi);
 extern void WIN_GetDisplayModes(_THIS, SDL_VideoDisplay *display);
 extern int WIN_SetDisplayMode(_THIS, SDL_VideoDisplay *display, SDL_DisplayMode *mode);
@@ -48,5 +50,3 @@ extern void WIN_RefreshDisplays(_THIS);
 extern void WIN_QuitModes(_THIS);
 
 #endif /* SDL_windowsmodes_h_ */
-
-/* vi: set ts=4 sw=4 expandtab: */

@@ -198,7 +198,7 @@ static int kbd_cleanup_atexit_installed = 0;
 static struct sigaction old_sigaction[NSIG];
 
 static int fatal_signals[] = {
-    /* Handlers for SIGTERM and SIGINT are installed in SDL_QuitInit. */
+    /* Handlers for SIGTERM and SIGINT are installed in SDL_InitQuit. */
     SIGHUP, SIGQUIT, SIGILL, SIGABRT,
     SIGFPE, SIGSEGV, SIGPIPE, SIGBUS,
     SIGSYS
@@ -851,5 +851,3 @@ void SDL_EVDEV_kbd_quit(SDL_EVDEV_keyboard_state *state)
 }
 
 #endif /* SDL_INPUT_LINUXKD */
-
-/* vi: set ts=4 sw=4 expandtab: */

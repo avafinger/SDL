@@ -525,7 +525,7 @@ static int Wayland_ShowCursor(SDL_Cursor *cursor)
     return 0;
 }
 
-static void Wayland_WarpMouse(SDL_Window *window, int x, int y)
+static void Wayland_WarpMouse(SDL_Window *window, float x, float y)
 {
     SDL_VideoDevice *vd = SDL_GetVideoDevice();
     SDL_VideoData *d = vd->driverdata;
@@ -541,11 +541,6 @@ static void Wayland_WarpMouse(SDL_Window *window, int x, int y)
             input->relative_mode_override = SDL_TRUE;
         }
     }
-}
-
-static int Wayland_WarpMouseGlobal(int x, int y)
-{
-    return SDL_Unsupported();
 }
 
 static int Wayland_SetRelativeMouseMode(SDL_bool enabled)
@@ -646,7 +641,6 @@ void Wayland_InitMouse(void)
     mouse->ShowCursor = Wayland_ShowCursor;
     mouse->FreeCursor = Wayland_FreeCursor;
     mouse->WarpMouse = Wayland_WarpMouse;
-    mouse->WarpMouseGlobal = Wayland_WarpMouseGlobal;
     mouse->SetRelativeMouseMode = Wayland_SetRelativeMouseMode;
 
     input->relative_mode_override = SDL_FALSE;
@@ -674,5 +668,3 @@ void Wayland_FiniMouse(SDL_VideoData *data)
 }
 
 #endif /* SDL_VIDEO_DRIVER_WAYLAND */
-
-/* vi: set ts=4 sw=4 expandtab: */

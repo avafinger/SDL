@@ -345,7 +345,7 @@ static Sint32 unifont_draw_glyph(Uint32 codepoint, int rendererID, SDL_Rect *dst
         const Uint32 cInTex = codepoint % UNIFONT_GLYPHS_IN_TEXTURE;
         srcrect.x = cInTex % UNIFONT_GLYPHS_IN_ROW * 16;
         srcrect.y = cInTex / UNIFONT_GLYPHS_IN_ROW * 16;
-        SDL_RenderCopy(state->renderers[rendererID], texture, &srcrect, dstrect);
+        SDL_RenderTexture(state->renderers[rendererID], texture, &srcrect, dstrect);
     }
     return unifontGlyph[codepoint].width;
 }
@@ -496,9 +496,9 @@ static void _Redraw(int rendererID)
         drawnTextRect.h = textSur->h;
 
         texture = SDL_CreateTextureFromSurface(renderer, textSur);
-        SDL_FreeSurface(textSur);
+        SDL_DestroySurface(textSur);
 
-        SDL_RenderCopy(renderer, texture, NULL, &drawnTextRect);
+        SDL_RenderTexture(renderer, texture, NULL, &drawnTextRect);
         SDL_DestroyTexture(texture);
 #else
         char *utext = text;
@@ -567,9 +567,9 @@ static void _Redraw(int rendererID)
         drawnTextRect.h = textSur->h;
 
         texture = SDL_CreateTextureFromSurface(renderer, textSur);
-        SDL_FreeSurface(textSur);
+        SDL_DestroySurface(textSur);
 
-        SDL_RenderCopy(renderer, texture, NULL, &drawnTextRect);
+        SDL_RenderTexture(renderer, texture, NULL, &drawnTextRect);
         SDL_DestroyTexture(texture);
 #else
         int i = 0;
@@ -790,5 +790,3 @@ int main(int argc, char *argv[])
     SDLTest_CommonQuit(state);
     return 0;
 }
-
-/* vi: set ts=4 sw=4 expandtab: */

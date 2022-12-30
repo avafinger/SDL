@@ -114,7 +114,7 @@ static int DSP_OpenDevice(_THIS, const char *devname)
 
     /* Try for a closest match on audio format */
     format = 0;
-    for (test_format = SDL_FirstAudioFormat(this->spec.format);
+    for (test_format = SDL_GetFirstAudioFormat(this->spec.format);
          !format && test_format;) {
 #ifdef DEBUG_AUDIO
         fprintf(stderr, "Trying format 0x%4.4x\n", test_format);
@@ -161,7 +161,7 @@ static int DSP_OpenDevice(_THIS, const char *devname)
             break;
         }
         if (!format) {
-            test_format = SDL_NextAudioFormat();
+            test_format = SDL_GetNextAudioFormat();
         }
     }
     if (format == 0) {
@@ -313,5 +313,3 @@ AudioBootStrap DSP_bootstrap = {
 };
 
 #endif /* SDL_AUDIO_DRIVER_OSS */
-
-/* vi: set ts=4 sw=4 expandtab: */

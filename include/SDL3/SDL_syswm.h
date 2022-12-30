@@ -39,7 +39,7 @@
  *  Your application has access to a special type of event ::SDL_SYSWMEVENT,
  *  which contains window-manager specific information and arrives whenever
  *  an unhandled window event occurs.  This event is ignored by default, but
- *  you can enable it with SDL_EventState().
+ *  you can enable it with SDL_SetEventEnabled().
  *
  *  As of SDL 3.0, this file no longer includes the platform specific headers
  *  and types. You should include the headers you need and define one or more
@@ -264,5 +264,3 @@ extern DECLSPEC int SDLCALL SDL_GetWindowWMInfo(SDL_Window *window, SDL_SysWMinf
 #include <SDL3/SDL_close_code.h>
 
 #endif /* SDL_syswm_h_ */
-
-/* vi: set ts=4 sw=4 expandtab: */

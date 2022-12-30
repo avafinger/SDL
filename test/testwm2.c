@@ -64,18 +64,18 @@ draw_modes_menu(SDL_Window *window, SDL_Renderer *renderer, SDL_Rect viewport)
     int text_length;
     int x, y;
     int table_top;
-    SDL_Point mouse_pos = { -1, -1 };
+    SDL_FPoint mouse_pos = { -1.0f, -1.0f };
 
     /* Get mouse position */
     if (SDL_GetMouseFocus() == window) {
-        int window_x, window_y;
+        float window_x, window_y;
         float logical_x, logical_y;
 
         SDL_GetMouseState(&window_x, &window_y);
         SDL_RenderWindowToLogical(renderer, window_x, window_y, &logical_x, &logical_y);
 
-        mouse_pos.x = (int)logical_x;
-        mouse_pos.y = (int)logical_y;
+        mouse_pos.x = logical_x;
+        mouse_pos.y = logical_y;
     }
 
     x = 0;
@@ -101,7 +101,7 @@ draw_modes_menu(SDL_Window *window, SDL_Renderer *renderer, SDL_Rect viewport)
     }
 
     for (i = 0; i < num_modes; ++i) {
-        SDL_Rect cell_rect;
+        SDL_FRect cell_rect;
 
         if (0 != SDL_GetDisplayMode(display_index, i, &mode)) {
             return;
@@ -115,12 +115,12 @@ draw_modes_menu(SDL_Window *window, SDL_Renderer *renderer, SDL_Rect viewport)
         column_chars = SDL_max(column_chars, text_length);
 
         /* Check if under mouse */
-        cell_rect.x = x;
-        cell_rect.y = y;
-        cell_rect.w = text_length * FONT_CHARACTER_SIZE;
-        cell_rect.h = lineHeight;
+        cell_rect.x = (float)x;
+        cell_rect.y = (float)y;
+        cell_rect.w = (float)(text_length * FONT_CHARACTER_SIZE);
+        cell_rect.h = (float)lineHeight;
 
-        if (SDL_PointInRect(&mouse_pos, &cell_rect)) {
+        if (SDL_PointInRectFloat(&mouse_pos, &cell_rect)) {
             SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 
             /* Update cached mode under the mouse */
@@ -199,7 +199,7 @@ void loop()
             }
             if (updateCursor) {
                 SDL_Log("Changing cursor to \"%s\"", cursorNames[system_cursor]);
-                SDL_FreeCursor(cursor);
+                SDL_DestroyCursor(cursor);
                 cursor = SDL_CreateSystemCursor((SDL_SystemCursor)system_cursor);
                 SDL_SetCursor(cursor);
             }
@@ -225,7 +225,7 @@ void loop()
             int y = 0;
             SDL_Rect viewport, menurect;
 
-            SDL_RenderGetViewport(renderer, &viewport);
+            SDL_GetRenderViewport(renderer, &viewport);
 
             SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
             SDL_RenderClear(renderer);
@@ -269,8 +269,8 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    SDL_EventState(SDL_DROPFILE, SDL_ENABLE);
-    SDL_EventState(SDL_DROPTEXT, SDL_ENABLE);
+    SDL_SetEventEnabled(SDL_DROPFILE, SDL_TRUE);
+    SDL_SetEventEnabled(SDL_DROPTEXT, SDL_TRUE);
 
     for (i = 0; i < state->num_windows; ++i) {
         SDL_Renderer *renderer = state->renderers[i];
@@ -287,11 +287,9 @@ int main(int argc, char *argv[])
         loop();
     }
 #endif
-    SDL_FreeCursor(cursor);
+    SDL_DestroyCursor(cursor);
 
     quit(0);
     /* keep the compiler happy ... */
     return 0;
 }
-
-/* vi: set ts=4 sw=4 expandtab: */
