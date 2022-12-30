@@ -82,6 +82,8 @@ The timestamp_us member of the sensor events has been renamed sensor_timestamp a
 
 You should set the event.common.timestamp field before passing an event to SDL_PushEvent(). If the timestamp is 0 it will be filled in with SDL_GetTicksNS().
 
+Mouse events use floating point values for mouse coordinates and relative motion values. You can get sub-pixel motion depending on the platform and display scaling.
+
 The SDL_DISPLAYEVENT_* events have been moved to top level events, and SDL_DISPLAYEVENT has been removed. In general, handling this change just means checking for the individual events instead of first checking for SDL_DISPLAYEVENT and then checking for display events. You can compare the event >= SDL_DISPLAYEVENT_FIRST and <= SDL_DISPLAYEVENT_LAST if you need to see whether it's a display event.
 
 The SDL_WINDOWEVENT_* events have been moved to top level events, and SDL_WINDOWEVENT has been removed. In general, handling this change just means checking for the individual events instead of first checking for SDL_WINDOWEVENT and then checking for window events. You can compare the event >= SDL_WINDOWEVENT_FIRST and <= SDL_WINDOWEVENT_LAST if you need to see whether it's a window event.
@@ -117,7 +119,7 @@ SDL_gamecontroller.h has been renamed SDL_gamepad.h, and all APIs have been rena
 
 The SDL_GAMEPADADDED event now provides the joystick instance ID in the which member of the cdevice event structure.
 
-The functions SDL_HasGamepads(), SDL_GetGamepads(), SDL_GetGamepadInstanceName(), SDL_GetGamepadInstancePath(), SDL_GetGamepadInstancePlayerIndex(), SDL_GetGamepadInstanceGUID(), SDL_GetGamepadInstanceVendor(), SDL_GetGamepadInstanceProduct(), SDL_GetGamepadInstanceProductVersion(), and SDL_GetGamepadInstanceType() have been added to directly query the list of available gamepads.
+The functions SDL_GetGamepads(), SDL_GetGamepadInstanceName(), SDL_GetGamepadInstancePath(), SDL_GetGamepadInstancePlayerIndex(), SDL_GetGamepadInstanceGUID(), SDL_GetGamepadInstanceVendor(), SDL_GetGamepadInstanceProduct(), SDL_GetGamepadInstanceProductVersion(), and SDL_GetGamepadInstanceType() have been added to directly query the list of available gamepads.
 
 SDL_GameControllerGetSensorDataWithTimestamp() has been removed. If you want timestamps for the sensor data, you should use the sensor_timestamp member of SDL_GAMEPADSENSORUPDATE events.
 
@@ -295,7 +297,7 @@ Rather than iterating over joysticks using device index, there is a new function
 
 The SDL_JOYDEVICEADDED event now provides the joystick instance ID in the `which` member of the jdevice event structure.
 
-The functions SDL_HasJoysticks(), SDL_GetJoysticks(), SDL_GetJoystickInstanceName(), SDL_GetJoystickInstancePath(), SDL_GetJoystickInstancePlayerIndex(), SDL_GetJoystickInstanceGUID(), SDL_GetJoystickInstanceVendor(), SDL_GetJoystickInstanceProduct(), SDL_GetJoystickInstanceProductVersion(), and SDL_GetJoystickInstanceType() have been added to directly query the list of available joysticks.
+The functions SDL_GetJoysticks(), SDL_GetJoystickInstanceName(), SDL_GetJoystickInstancePath(), SDL_GetJoystickInstancePlayerIndex(), SDL_GetJoystickInstanceGUID(), SDL_GetJoystickInstanceVendor(), SDL_GetJoystickInstanceProduct(), SDL_GetJoystickInstanceProductVersion(), and SDL_GetJoystickInstanceType() have been added to directly query the list of available joysticks.
 
 SDL_AttachVirtualJoystick() and SDL_AttachVirtualJoystickEx() now return the joystick instance ID instead of a device index, and return 0 if there was an error.
 
@@ -354,7 +356,7 @@ The following functions have been removed:
 * SDL_JoystickGetDeviceVendor() - replaced with SDL_GetJoystickInstanceVendor()
 * SDL_JoystickNameForIndex() - replaced with SDL_GetJoystickInstanceName()
 * SDL_JoystickPathForIndex() - replaced with SDL_GetJoystickInstancePath()
-* SDL_NumJoysticks - replaced with SDL_HasJoysticks() and SDL_GetJoysticks()
+* SDL_NumJoysticks - replaced with SDL_GetJoysticks()
  
 ## SDL_keycode.h
 
@@ -411,6 +413,8 @@ used by additional platforms that didn't have a SDL_RunApp-like function before)
 
 SDL_ShowCursor() has been split into three functions: SDL_ShowCursor(), SDL_HideCursor(), and SDL_CursorVisible()
 
+SDL_GetMouseState(), SDL_GetGlobalMouseState(), SDL_GetRelativeMouseState(), SDL_WarpMouseInWindow(), and SDL_WarpMouseGlobal() all use floating point mouse positions, to provide sub-pixel precision on platforms that support it.
+
 The following functions have been renamed:
 * SDL_FreeCursor() => SDL_DestroyCursor()
 
@@ -462,6 +466,8 @@ Additionally, SDL_CreateRenderer()'s second argument is no longer an integer ind
 which index is the "opengl" or whatnot driver, you can just pass that string directly
 here, now. Passing NULL is the same as passing -1 here in SDL2, to signify you want SDL
 to decide for you.
+
+SDL_RenderWindowToLogical() and SDL_RenderLogicalToWindow() take floating point coordinates in both directions.
 
 The following functions have been renamed:
 * SDL_RenderCopy() => SDL_RenderTexture()
@@ -698,7 +704,7 @@ The following functions have been renamed:
 
 The following functions have been removed:
 * SDL_LockSensors()
-* SDL_NumSensors() - replaced with SDL_HasSensors() and SDL_GetSensors()
+* SDL_NumSensors() - replaced with SDL_GetSensors()
 * SDL_SensorGetDeviceInstanceID()
 * SDL_SensorGetDeviceName() - replaced with SDL_GetSensorInstanceName()
 * SDL_SensorGetDeviceNonPortableType() - replaced with SDL_GetSensorInstanceNonPortableType()
