@@ -86,7 +86,7 @@ extern "C" {
  *       mdContext. Call before each new use of the context -
  *       all fields are set to zero.
  */
- void SDLTest_Md5Init(SDLTest_Md5Context * mdContext);
+ void SDLTest_Md5Init(SDLTest_Md5Context *mdContext);
 
 
 /**
@@ -101,7 +101,7 @@ extern "C" {
  *       in the message whose digest is being computed.
 */
 
- void SDLTest_Md5Update(SDLTest_Md5Context * mdContext, unsigned char *inBuf,
+ void SDLTest_Md5Update(SDLTest_Md5Context *mdContext, unsigned char *inBuf,
                  unsigned int inLen);
 
 
@@ -115,7 +115,7 @@ extern "C" {
  *       Always call before using the digest[] variable.
 */
 
- void SDLTest_Md5Final(SDLTest_Md5Context * mdContext);
+ void SDLTest_Md5Final(SDLTest_Md5Context *mdContext);
 
 
 /* Ends C function definitions when using C++ */
@@ -125,5 +125,3 @@ extern "C" {
 #include <SDL3/SDL_close_code.h>
 
 #endif /* SDL_test_md5_h_ */
-
-/* vi: set ts=4 sw=4 expandtab: */

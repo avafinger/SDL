@@ -204,7 +204,7 @@ static int run_automated_tests(int pattern_size, int extra_pitch)
 done:
     SDL_free(yuv1);
     SDL_free(yuv2);
-    SDL_FreeSurface(pattern);
+    SDL_DestroySurface(pattern);
     return result;
 }
 
@@ -429,7 +429,7 @@ int main(int argc, char **argv)
             }
 
             SDL_RenderClear(renderer);
-            SDL_RenderCopy(renderer, output[current], NULL, NULL);
+            SDL_RenderTexture(renderer, output[current], NULL, NULL);
             SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
             if (current == 0) {
                 SDLTest_DrawString(renderer, 4, 4, titles[current]);
@@ -444,5 +444,3 @@ int main(int argc, char **argv)
     SDL_Quit();
     return 0;
 }
-
-/* vi: set ts=4 sw=4 expandtab: */

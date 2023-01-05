@@ -256,7 +256,7 @@ static void WINRT_DXGIModeToSDLDisplayMode(const DXGI_MODE_DESC *dxgiMode, SDL_D
     SDL_zerop(sdlMode);
     sdlMode->w = dxgiMode->Width;
     sdlMode->h = dxgiMode->Height;
-    sdlMode->refresh_rate = dxgiMode->RefreshRate.Numerator / dxgiMode->RefreshRate.Denominator;
+    sdlMode->refresh_rate = (((100 * dxgiMode->RefreshRate.Numerator) / dxgiMode->RefreshRate.Denominator) / 100.0f);
     sdlMode->format = D3D11_DXGIFormatToSDLPixelFormat(dxgiMode->Format);
 }
 
@@ -307,7 +307,7 @@ static int WINRT_AddDisplaysForOutput(_THIS, IDXGIAdapter1 *dxgiAdapter1, int ou
         mode.w = (dxgiOutputDesc.DesktopCoordinates.right - dxgiOutputDesc.DesktopCoordinates.left);
         mode.h = (dxgiOutputDesc.DesktopCoordinates.bottom - dxgiOutputDesc.DesktopCoordinates.top);
         mode.format = DXGI_FORMAT_B8G8R8A8_UNORM;
-        mode.refresh_rate = 0; /* Display mode is unknown, so just fill in zero, as specified by SDL's header files */
+        mode.refresh_rate = 0.0f; /* Display mode is unknown, so just fill in zero, as specified by SDL's header files */
         display.desktop_mode = mode;
         display.current_mode = mode;
         if (!SDL_AddDisplayMode(&display, &mode)) {
@@ -427,7 +427,7 @@ static int WINRT_AddDisplaysForAdapter(_THIS, IDXGIFactory2 *dxgiFactory2, int a
 #endif
 
                 mode.format = DXGI_FORMAT_B8G8R8A8_UNORM;
-                mode.refresh_rate = 0; /* Display mode is unknown, so just fill in zero, as specified by SDL's header files */
+                mode.refresh_rate = 0.0f; /* Display mode is unknown, so just fill in zero, as specified by SDL's header files */
                 display.desktop_mode = mode;
                 display.current_mode = mode;
                 bool error = SDL_AddDisplayMode(&display, &mode) < 0 ||
@@ -489,7 +489,7 @@ void WINRT_VideoQuit(_THIS)
     WINRT_QuitMouse(_this);
 }
 
-static const Uint32 WINRT_DetectableFlags = SDL_WINDOW_MAXIMIZED | SDL_WINDOW_FULLSCREEN_DESKTOP | SDL_WINDOW_SHOWN | SDL_WINDOW_HIDDEN | SDL_WINDOW_MOUSE_FOCUS;
+static const Uint32 WINRT_DetectableFlags = SDL_WINDOW_MAXIMIZED | SDL_WINDOW_FULLSCREEN_DESKTOP | SDL_WINDOW_HIDDEN | SDL_WINDOW_MOUSE_FOCUS;
 
 extern "C" Uint32
 WINRT_DetectWindowFlags(SDL_Window *window)
@@ -541,7 +541,7 @@ WINRT_DetectWindowFlags(SDL_Window *window)
         }
 
         if (data->coreWindow->Visible) {
-            latestFlags |= SDL_WINDOW_SHOWN;
+            latestFlags &= ~SDL_WINDOW_HIDDEN;
         } else {
             latestFlags |= SDL_WINDOW_HIDDEN;
         }
@@ -693,7 +693,7 @@ int WINRT_CreateWindow(_THIS, SDL_Window *window)
         /* TODO, WinRT: set SDL_Window size, maybe position too, from XAML control */
         window->x = 0;
         window->y = 0;
-        window->flags |= SDL_WINDOW_SHOWN;
+        window->flags &= ~SDL_WINDOW_HIDDEN;
         SDL_SetMouseFocus(NULL);    // TODO: detect this
         SDL_SetKeyboardFocus(NULL); // TODO: detect this
     } else {
@@ -860,5 +860,3 @@ void WINRT_SuspendScreenSaver(_THIS)
 }
 
 #endif /* SDL_VIDEO_DRIVER_WINRT */
-
-/* vi: set ts=4 sw=4 expandtab: */

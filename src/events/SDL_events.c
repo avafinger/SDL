@@ -28,6 +28,9 @@
 #if !SDL_JOYSTICK_DISABLED
 #include "../joystick/SDL_joystick_c.h"
 #endif
+#if !SDL_SENSOR_DISABLED
+#include "../sensor/SDL_sensor_c.h"
+#endif
 #include "../video/SDL_sysvideo.h"
 #include <SDL3/SDL_syswm.h>
 
@@ -68,18 +71,18 @@ static SDL_DisabledEventBlock *SDL_disabled_events[256];
 static Uint32 SDL_userevents = SDL_USEREVENT;
 
 /* Private data -- event queue */
-typedef struct _SDL_EventEntry
+typedef struct SDL_EventEntry
 {
     SDL_Event event;
     SDL_SysWMmsg msg;
-    struct _SDL_EventEntry *prev;
-    struct _SDL_EventEntry *next;
+    struct SDL_EventEntry *prev;
+    struct SDL_EventEntry *next;
 } SDL_EventEntry;
 
-typedef struct _SDL_SysWMEntry
+typedef struct SDL_SysWMEntry
 {
     SDL_SysWMmsg msg;
-    struct _SDL_SysWMEntry *next;
+    struct SDL_SysWMEntry *next;
 } SDL_SysWMEntry;
 
 static struct
@@ -99,19 +102,9 @@ static struct
 
 static SDL_bool SDL_update_joysticks = SDL_TRUE;
 
-static void SDL_CalculateShouldUpdateJoysticks(SDL_bool hint_value)
-{
-    if (hint_value &&
-        (!SDL_disabled_events[SDL_JOYAXISMOTION >> 8] || SDL_JoystickEventState(SDL_QUERY))) {
-        SDL_update_joysticks = SDL_TRUE;
-    } else {
-        SDL_update_joysticks = SDL_FALSE;
-    }
-}
-
 static void SDLCALL SDL_AutoUpdateJoysticksChanged(void *userdata, const char *name, const char *oldValue, const char *hint)
 {
-    SDL_CalculateShouldUpdateJoysticks(SDL_GetStringBoolean(hint, SDL_TRUE));
+    SDL_update_joysticks = SDL_GetStringBoolean(hint, SDL_TRUE);
 }
 
 #endif /* !SDL_JOYSTICK_DISABLED */
@@ -120,26 +113,16 @@ static void SDLCALL SDL_AutoUpdateJoysticksChanged(void *userdata, const char *n
 
 static SDL_bool SDL_update_sensors = SDL_TRUE;
 
-static void SDL_CalculateShouldUpdateSensors(SDL_bool hint_value)
-{
-    if (hint_value &&
-        !SDL_disabled_events[SDL_SENSORUPDATE >> 8]) {
-        SDL_update_sensors = SDL_TRUE;
-    } else {
-        SDL_update_sensors = SDL_FALSE;
-    }
-}
-
 static void SDLCALL SDL_AutoUpdateSensorsChanged(void *userdata, const char *name, const char *oldValue, const char *hint)
 {
-    SDL_CalculateShouldUpdateSensors(SDL_GetStringBoolean(hint, SDL_TRUE));
+    SDL_update_sensors = SDL_GetStringBoolean(hint, SDL_TRUE);
 }
 
 #endif /* !SDL_SENSOR_DISABLED */
 
 static void SDLCALL SDL_PollSentinelChanged(void *userdata, const char *name, const char *oldValue, const char *hint)
 {
-    (void)SDL_EventState(SDL_POLLSENTINEL, SDL_GetStringBoolean(hint, SDL_TRUE) ? SDL_ENABLE : SDL_DISABLE);
+    SDL_SetEventEnabled(SDL_POLLSENTINEL, SDL_GetStringBoolean(hint, SDL_TRUE));
 }
 
 /**
@@ -165,8 +148,8 @@ static void SDL_LogEvent(const SDL_Event *event)
     if ((SDL_EventLoggingVerbosity < 2) &&
         ((event->type == SDL_MOUSEMOTION) ||
          (event->type == SDL_FINGERMOTION) ||
-         (event->type == SDL_CONTROLLERTOUCHPADMOTION) ||
-         (event->type == SDL_CONTROLLERSENSORUPDATE) ||
+         (event->type == SDL_GAMEPADTOUCHPADMOTION) ||
+         (event->type == SDL_GAMEPADSENSORUPDATE) ||
          (event->type == SDL_SENSORUPDATE))) {
         return;
     }
@@ -300,19 +283,19 @@ static void SDL_LogEvent(const SDL_Event *event)
         break;
 
         SDL_EVENT_CASE(SDL_MOUSEMOTION)
-        (void)SDL_snprintf(details, sizeof(details), " (timestamp=%u windowid=%u which=%u state=%u x=%d y=%d xrel=%d yrel=%d)",
+        (void)SDL_snprintf(details, sizeof(details), " (timestamp=%u windowid=%u which=%u state=%u x=%g y=%g xrel=%g yrel=%g)",
                            (uint)event->motion.timestamp, (uint)event->motion.windowID,
                            (uint)event->motion.which, (uint)event->motion.state,
-                           (int)event->motion.x, (int)event->motion.y,
-                           (int)event->motion.xrel, (int)event->motion.yrel);
+                           event->motion.x, event->motion.y,
+                           event->motion.xrel, event->motion.yrel);
         break;
 
 #define PRINT_MBUTTON_EVENT(event)                                                                                              \
-    (void)SDL_snprintf(details, sizeof(details), " (timestamp=%u windowid=%u which=%u button=%u state=%s clicks=%u x=%d y=%d)", \
+    (void)SDL_snprintf(details, sizeof(details), " (timestamp=%u windowid=%u which=%u button=%u state=%s clicks=%u x=%g y=%g)", \
                        (uint)event->button.timestamp, (uint)event->button.windowID,                                             \
                        (uint)event->button.which, (uint)event->button.button,                                                   \
                        event->button.state == SDL_PRESSED ? "pressed" : "released",                                             \
-                       (uint)event->button.clicks, (int)event->button.x, (int)event->button.y)
+                       (uint)event->button.clicks, event->button.x, event->button.y)
         SDL_EVENT_CASE(SDL_MOUSEBUTTONDOWN)
         PRINT_MBUTTON_EVENT(event);
         break;
@@ -322,10 +305,9 @@ static void SDL_LogEvent(const SDL_Event *event)
 #undef PRINT_MBUTTON_EVENT
 
         SDL_EVENT_CASE(SDL_MOUSEWHEEL)
-        (void)SDL_snprintf(details, sizeof(details), " (timestamp=%u windowid=%u which=%u x=%d y=%d preciseX=%f preciseY=%f direction=%s)",
+        (void)SDL_snprintf(details, sizeof(details), " (timestamp=%u windowid=%u which=%u x=%g y=%g direction=%s)",
                            (uint)event->wheel.timestamp, (uint)event->wheel.windowID,
-                           (uint)event->wheel.which, (int)event->wheel.x, (int)event->wheel.y,
-                           event->wheel.preciseX, event->wheel.preciseY,
+                           (uint)event->wheel.which, event->wheel.x, event->wheel.y,
                            event->wheel.direction == SDL_MOUSEWHEEL_NORMAL ? "normal" : "flipped");
         break;
 
@@ -362,7 +344,7 @@ static void SDL_LogEvent(const SDL_Event *event)
         break;
 #undef PRINT_JOYDEV_EVENT
 
-        SDL_EVENT_CASE(SDL_CONTROLLERAXISMOTION)
+        SDL_EVENT_CASE(SDL_GAMEPADAXISMOTION)
         (void)SDL_snprintf(details, sizeof(details), " (timestamp=%u which=%d axis=%u value=%d)",
                            (uint)event->caxis.timestamp, (int)event->caxis.which,
                            (uint)event->caxis.axis, (int)event->caxis.value);
@@ -372,43 +354,43 @@ static void SDL_LogEvent(const SDL_Event *event)
     (void)SDL_snprintf(details, sizeof(details), " (timestamp=%u which=%d button=%u state=%s)", \
                        (uint)event->cbutton.timestamp, (int)event->cbutton.which,               \
                        (uint)event->cbutton.button, event->cbutton.state == SDL_PRESSED ? "pressed" : "released")
-        SDL_EVENT_CASE(SDL_CONTROLLERBUTTONDOWN)
+        SDL_EVENT_CASE(SDL_GAMEPADBUTTONDOWN)
         PRINT_CBUTTON_EVENT(event);
         break;
-        SDL_EVENT_CASE(SDL_CONTROLLERBUTTONUP)
+        SDL_EVENT_CASE(SDL_GAMEPADBUTTONUP)
         PRINT_CBUTTON_EVENT(event);
         break;
 #undef PRINT_CBUTTON_EVENT
 
-#define PRINT_CONTROLLERDEV_EVENT(event) (void)SDL_snprintf(details, sizeof(details), " (timestamp=%u which=%d)", (uint)event->cdevice.timestamp, (int)event->cdevice.which)
-        SDL_EVENT_CASE(SDL_CONTROLLERDEVICEADDED)
-        PRINT_CONTROLLERDEV_EVENT(event);
+#define PRINT_GAMEPADDEV_EVENT(event) (void)SDL_snprintf(details, sizeof(details), " (timestamp=%u which=%d)", (uint)event->cdevice.timestamp, (int)event->cdevice.which)
+        SDL_EVENT_CASE(SDL_GAMEPADADDED)
+        PRINT_GAMEPADDEV_EVENT(event);
         break;
-        SDL_EVENT_CASE(SDL_CONTROLLERDEVICEREMOVED)
-        PRINT_CONTROLLERDEV_EVENT(event);
+        SDL_EVENT_CASE(SDL_GAMEPADREMOVED)
+        PRINT_GAMEPADDEV_EVENT(event);
         break;
-        SDL_EVENT_CASE(SDL_CONTROLLERDEVICEREMAPPED)
-        PRINT_CONTROLLERDEV_EVENT(event);
+        SDL_EVENT_CASE(SDL_GAMEPADREMAPPED)
+        PRINT_GAMEPADDEV_EVENT(event);
         break;
-#undef PRINT_CONTROLLERDEV_EVENT
+#undef PRINT_GAMEPADDEV_EVENT
 
 #define PRINT_CTOUCHPAD_EVENT(event)                                                                                     \
     (void)SDL_snprintf(details, sizeof(details), " (timestamp=%u which=%d touchpad=%d finger=%d x=%f y=%f pressure=%f)", \
                        (uint)event->ctouchpad.timestamp, (int)event->ctouchpad.which,                                    \
                        (int)event->ctouchpad.touchpad, (int)event->ctouchpad.finger,                                     \
                        event->ctouchpad.x, event->ctouchpad.y, event->ctouchpad.pressure)
-        SDL_EVENT_CASE(SDL_CONTROLLERTOUCHPADDOWN)
+        SDL_EVENT_CASE(SDL_GAMEPADTOUCHPADDOWN)
         PRINT_CTOUCHPAD_EVENT(event);
         break;
-        SDL_EVENT_CASE(SDL_CONTROLLERTOUCHPADUP)
+        SDL_EVENT_CASE(SDL_GAMEPADTOUCHPADUP)
         PRINT_CTOUCHPAD_EVENT(event);
         break;
-        SDL_EVENT_CASE(SDL_CONTROLLERTOUCHPADMOTION)
+        SDL_EVENT_CASE(SDL_GAMEPADTOUCHPADMOTION)
         PRINT_CTOUCHPAD_EVENT(event);
         break;
 #undef PRINT_CTOUCHPAD_EVENT
 
-        SDL_EVENT_CASE(SDL_CONTROLLERSENSORUPDATE)
+        SDL_EVENT_CASE(SDL_GAMEPADSENSORUPDATE)
         (void)SDL_snprintf(details, sizeof(details), " (timestamp=%u which=%d sensor=%d data[0]=%f data[1]=%f data[2]=%f)",
                            (uint)event->csensor.timestamp, (int)event->csensor.which, (int)event->csensor.sensor,
                            event->csensor.data[0], event->csensor.data[1], event->csensor.data[2]);
@@ -585,12 +567,12 @@ int SDL_StartEventLoop(void)
 #endif /* !SDL_THREADS_DISABLED */
 
     /* Process most event types */
-    (void)SDL_EventState(SDL_TEXTINPUT, SDL_DISABLE);
-    (void)SDL_EventState(SDL_TEXTEDITING, SDL_DISABLE);
-    (void)SDL_EventState(SDL_SYSWMEVENT, SDL_DISABLE);
+    SDL_SetEventEnabled(SDL_TEXTINPUT, SDL_FALSE);
+    SDL_SetEventEnabled(SDL_TEXTEDITING, SDL_FALSE);
+    SDL_SetEventEnabled(SDL_SYSWMEVENT, SDL_FALSE);
 #if 0 /* Leave these events enabled so apps can respond to items being dragged onto them at startup */
-    (void)SDL_EventState(SDL_DROPFILE, SDL_DISABLE);
-    (void)SDL_EventState(SDL_DROPTEXT, SDL_DISABLE);
+    SDL_SetEventEnabled(SDL_DROPFILE, SDL_FALSE);
+    SDL_SetEventEnabled(SDL_DROPTEXT, SDL_FALSE);
 #endif
 
     SDL_EventQ.active = SDL_TRUE;
@@ -870,20 +852,20 @@ static void SDL_PumpEventsInternal(SDL_bool push_sentinel)
 #if !SDL_JOYSTICK_DISABLED
     /* Check for joystick state change */
     if (SDL_update_joysticks) {
-        SDL_JoystickUpdate();
+        SDL_UpdateJoysticks();
     }
 #endif
 
 #if !SDL_SENSOR_DISABLED
     /* Check for sensor state change */
     if (SDL_update_sensors) {
-        SDL_SensorUpdate();
+        SDL_UpdateSensors();
     }
 #endif
 
     SDL_SendPendingSignalEvents(); /* in case we had a signal handler fire, etc. */
 
-    if (push_sentinel && SDL_GetEventState(SDL_POLLSENTINEL) == SDL_ENABLE) {
+    if (push_sentinel && SDL_EventEnabled(SDL_POLLSENTINEL)) {
         SDL_Event sentinel;
 
         sentinel.type = SDL_POLLSENTINEL;
@@ -909,13 +891,7 @@ static SDL_bool SDL_events_need_periodic_poll()
     SDL_bool need_periodic_poll = SDL_FALSE;
 
 #if !SDL_JOYSTICK_DISABLED
-    need_periodic_poll =
-        SDL_WasInit(SDL_INIT_JOYSTICK) && SDL_update_joysticks;
-#endif
-
-#if !SDL_SENSOR_DISABLED
-    need_periodic_poll = need_periodic_poll ||
-                         (SDL_WasInit(SDL_INIT_SENSOR) && SDL_update_sensors);
+    need_periodic_poll = SDL_WasInit(SDL_INIT_JOYSTICK) && SDL_update_joysticks;
 #endif
 
     return need_periodic_poll;
@@ -998,15 +974,12 @@ static SDL_bool SDL_events_need_polling()
     SDL_bool need_polling = SDL_FALSE;
 
 #if !SDL_JOYSTICK_DISABLED
-    need_polling =
-        SDL_WasInit(SDL_INIT_JOYSTICK) &&
-        SDL_update_joysticks &&
-        (SDL_NumJoysticks() > 0);
+    need_polling = SDL_WasInit(SDL_INIT_JOYSTICK) && SDL_update_joysticks && SDL_JoysticksOpened();
 #endif
 
 #if !SDL_SENSOR_DISABLED
     need_polling = need_polling ||
-                   (SDL_WasInit(SDL_INIT_SENSOR) && SDL_update_sensors && (SDL_NumSensors() > 0));
+                   (SDL_WasInit(SDL_INIT_SENSOR) && SDL_update_sensors && SDL_SensorsOpened());
 #endif
 
     return need_polling;
@@ -1269,22 +1242,23 @@ void SDL_FilterEvents(SDL_EventFilter filter, void *userdata)
     SDL_UnlockMutex(SDL_EventQ.lock);
 }
 
-Uint8 SDL_EventState(Uint32 type, int state)
+void SDL_SetEventEnabled(Uint32 type, SDL_bool enabled)
 {
-    const SDL_bool isde = (state == SDL_DISABLE) || (state == SDL_ENABLE);
-    Uint8 current_state;
+    SDL_bool current_state;
     Uint8 hi = ((type >> 8) & 0xff);
     Uint8 lo = (type & 0xff);
 
     if (SDL_disabled_events[hi] &&
         (SDL_disabled_events[hi]->bits[lo / 32] & (1 << (lo & 31)))) {
-        current_state = SDL_DISABLE;
+        current_state = SDL_FALSE;
     } else {
-        current_state = SDL_ENABLE;
+        current_state = SDL_TRUE;
     }
 
-    if (isde && state != current_state) {
-        if (state == SDL_DISABLE) {
+    if (enabled != current_state) {
+        if (enabled) {
+            SDL_disabled_events[hi]->bits[lo / 32] &= ~(1 << (lo & 31));
+        } else {
             /* Disable this event type and discard pending events */
             if (!SDL_disabled_events[hi]) {
                 SDL_disabled_events[hi] = (SDL_DisabledEventBlock *)SDL_calloc(1, sizeof(SDL_DisabledEventBlock));
@@ -1294,30 +1268,27 @@ Uint8 SDL_EventState(Uint32 type, int state)
                 SDL_disabled_events[hi]->bits[lo / 32] |= (1 << (lo & 31));
                 SDL_FlushEvent(type);
             }
-        } else { // state == SDL_ENABLE
-            SDL_disabled_events[hi]->bits[lo / 32] &= ~(1 << (lo & 31));
         }
 
-#if !SDL_JOYSTICK_DISABLED
-        SDL_CalculateShouldUpdateJoysticks(SDL_GetHintBoolean(SDL_HINT_AUTO_UPDATE_JOYSTICKS, SDL_TRUE));
-#endif
-#if !SDL_SENSOR_DISABLED
-        SDL_CalculateShouldUpdateSensors(SDL_GetHintBoolean(SDL_HINT_AUTO_UPDATE_SENSORS, SDL_TRUE));
-#endif
+        /* turn off drag'n'drop support if we've disabled the events.
+           This might change some UI details at the OS level. */
+        if (type == SDL_DROPFILE || type == SDL_DROPTEXT) {
+            SDL_ToggleDragAndDropSupport();
+        }
     }
-
-    /* turn off drag'n'drop support if we've disabled the events.
-       This might change some UI details at the OS level. */
-    if (isde && ((type == SDL_DROPFILE) || (type == SDL_DROPTEXT))) {
-        SDL_ToggleDragAndDropSupport();
-    }
-
-    return current_state;
 }
 
-Uint8 SDL_GetEventState(Uint32 type)
+SDL_bool SDL_EventEnabled(Uint32 type)
 {
-    return SDL_EventState(type, SDL_QUERY);
+    Uint8 hi = ((type >> 8) & 0xff);
+    Uint8 lo = (type & 0xff);
+
+    if (SDL_disabled_events[hi] &&
+        (SDL_disabled_events[hi]->bits[lo / 32] & (1 << (lo & 31)))) {
+        return SDL_FALSE;
+    } else {
+        return SDL_TRUE;
+    }
 }
 
 Uint32 SDL_RegisterEvents(int numevents)
@@ -1338,7 +1309,7 @@ int SDL_SendAppEvent(SDL_EventType eventType)
     int posted;
 
     posted = 0;
-    if (SDL_GetEventState(eventType) == SDL_ENABLE) {
+    if (SDL_EventEnabled(eventType)) {
         SDL_Event event;
         event.type = eventType;
         event.common.timestamp = 0;
@@ -1352,7 +1323,7 @@ int SDL_SendSysWMEvent(SDL_SysWMmsg *message)
     int posted;
 
     posted = 0;
-    if (SDL_GetEventState(SDL_SYSWMEVENT) == SDL_ENABLE) {
+    if (SDL_EventEnabled(SDL_SYSWMEVENT)) {
         SDL_Event event;
         SDL_memset(&event, 0, sizeof(event));
         event.type = SDL_SYSWMEVENT;
@@ -1374,7 +1345,7 @@ int SDL_SendLocaleChangedEvent(void)
     return SDL_SendAppEvent(SDL_LOCALECHANGED);
 }
 
-int SDL_EventsInit(void)
+int SDL_InitEvents(void)
 {
 #if !SDL_JOYSTICK_DISABLED
     SDL_AddHintCallback(SDL_HINT_AUTO_UPDATE_JOYSTICKS, SDL_AutoUpdateJoysticksChanged, NULL);
@@ -1389,12 +1360,12 @@ int SDL_EventsInit(void)
         return -1;
     }
 
-    SDL_QuitInit();
+    SDL_InitQuit();
 
     return 0;
 }
 
-void SDL_EventsQuit(void)
+void SDL_QuitEvents(void)
 {
     SDL_QuitQuit();
     SDL_StopEventLoop();
@@ -1407,5 +1378,3 @@ void SDL_EventsQuit(void)
     SDL_DelHintCallback(SDL_HINT_AUTO_UPDATE_SENSORS, SDL_AutoUpdateSensorsChanged, NULL);
 #endif
 }
-
-/* vi: set ts=4 sw=4 expandtab: */

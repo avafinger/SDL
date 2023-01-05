@@ -161,7 +161,7 @@ static void SDL_ANDROID_SensorUpdate(SDL_Sensor *sensor)
     if (ALooper_pollAll(0, NULL, &events, (void **)&source) == LOOPER_ID_USER) {
         SDL_zero(event);
         while (ASensorEventQueue_getEvents(sensor->hwdata->eventqueue, &event, 1) > 0) {
-            SDL_PrivateSensorUpdate(timestamp, sensor, timestamp, event.data, SDL_arraysize(event.data));
+            SDL_SendSensorUpdate(timestamp, sensor, timestamp, event.data, SDL_arraysize(event.data));
         }
     }
 }
@@ -200,5 +200,3 @@ SDL_SensorDriver SDL_ANDROID_SensorDriver = {
 };
 
 #endif /* SDL_SENSOR_ANDROID */
-
-/* vi: set ts=4 sw=4 expandtab: */

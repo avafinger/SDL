@@ -159,9 +159,8 @@ int HAIKU_GL_SetSwapInterval(_THIS, int interval) {
     return SDL_Unsupported();
 }
 
-int HAIKU_GL_GetSwapInterval(_THIS) {
-    /* TODO: Implement this, if necessary? */
-    return 0;
+int HAIKU_GL_GetSwapInterval(_THIS, int *interval) {
+    return SDL_Unsupported();
 }
 
 
@@ -193,5 +192,3 @@ void HAIKU_GL_RebootContexts(_THIS) {
 #endif
 
 #endif /* SDL_VIDEO_DRIVER_HAIKU && SDL_VIDEO_OPENGL */
-
-/* vi: set ts=4 sw=4 expandtab: */

@@ -72,7 +72,7 @@ static int PS2_VideoInit(_THIS)
 
     current_mode.w = 640;
     current_mode.h = 480;
-    current_mode.refresh_rate = 60;
+    current_mode.refresh_rate = 60.0f;
 
     /* 32 bpp for default */
     current_mode.format = SDL_PIXELFORMAT_ABGR8888;
@@ -127,5 +127,3 @@ VideoBootStrap PS2_bootstrap = {
 };
 
 #endif /* SDL_VIDEO_DRIVER_PS2 */
-
-/* vi: set ts=4 sw=4 expandtab: */

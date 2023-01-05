@@ -43,7 +43,7 @@ SDL_GetPerformanceFrequency(void)
 
 void SDL_DelayNS(Uint64 ns)
 {
-    const Uint64 max_delay = 0xffffffff * SDL_NS_PER_US;
+    const Uint64 max_delay = 0xffffffffLLU * SDL_NS_PER_US;
     if (ns > max_delay) {
         ns = max_delay;
     }
@@ -51,5 +51,3 @@ void SDL_DelayNS(Uint64 ns)
 }
 
 #endif /* SDL_TIMER_VITA */
-
-/* vi: set ts=4 sw=4 expandtab: */

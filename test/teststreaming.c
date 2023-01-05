@@ -115,7 +115,7 @@ void loop()
     UpdateTexture(MooseTexture);
 
     SDL_RenderClear(renderer);
-    SDL_RenderCopy(renderer, MooseTexture, NULL, NULL);
+    SDL_RenderTexture(renderer, MooseTexture, NULL, NULL);
     SDL_RenderPresent(renderer);
 
 #ifdef __EMSCRIPTEN__
@@ -193,5 +193,3 @@ int main(int argc, char **argv)
     quit(0);
     return 0;
 }
-
-/* vi: set ts=4 sw=4 expandtab: */

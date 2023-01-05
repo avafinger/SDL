@@ -62,7 +62,7 @@ void loop()
 #endif
         SDL_PauseAudioDevice(cbd[0].dev, 1);
         SDL_CloseAudioDevice(cbd[0].dev);
-        SDL_FreeWAV(sound);
+        SDL_free(sound);
         SDL_Quit();
     }
 }
@@ -190,7 +190,7 @@ int main(int argc, char **argv)
                          SDL_GetError());
         } else {
             test_multi_audio(devcount);
-            SDL_FreeWAV(sound);
+            SDL_free(sound);
         }
 
         SDL_free(file);
@@ -199,5 +199,3 @@ int main(int argc, char **argv)
     SDL_Quit();
     return 0;
 }
-
-/* vi: set ts=4 sw=4 expandtab: */

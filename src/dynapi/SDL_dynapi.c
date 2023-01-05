@@ -367,7 +367,7 @@ SDL_DYNAPI_entry(Uint32 apiver, void *table, Uint32 tablesize)
 #include <windows.h>
 static SDL_INLINE void *get_sdlapi_entry(const char *fname, const char *sym)
 {
-    HANDLE lib = LoadLibraryA(fname);
+    HMODULE lib = LoadLibraryA(fname);
     void *retval = NULL;
     if (lib) {
         retval = GetProcAddress(lib, sym);
@@ -487,5 +487,3 @@ static void SDL_InitDynamicAPI(void)
 }
 
 #endif /* SDL_DYNAMIC_API */
-
-/* vi: set ts=4 sw=4 expandtab: */

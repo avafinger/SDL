@@ -78,8 +78,7 @@ extern "C" {
  *  \param ci         integer that defines the random sequence
  *
  */
- void SDLTest_RandomInit(SDLTest_RandomContext * rndContext, unsigned int xi,
-                  unsigned int ci);
+ void SDLTest_RandomInit(SDLTest_RandomContext *rndContext, unsigned int xi, unsigned int ci);
 
 /**
  *  \brief Initialize random number generator based on current system time.
@@ -111,5 +110,3 @@ extern "C" {
 #include <SDL3/SDL_close_code.h>
 
 #endif /* SDL_test_random_h_ */
-
-/* vi: set ts=4 sw=4 expandtab: */

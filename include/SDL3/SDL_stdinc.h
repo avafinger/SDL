@@ -72,9 +72,9 @@ char *alloca();
  * instead of checking the clang version if possible.
  */
 #ifdef __has_builtin
-#define _SDL_HAS_BUILTIN(x) __has_builtin(x)
+#define SDL_HAS_BUILTIN(x) __has_builtin(x)
 #else
-#define _SDL_HAS_BUILTIN(x) 0
+#define SDL_HAS_BUILTIN(x) 0
 #endif
 
 /**
@@ -580,6 +580,8 @@ extern DECLSPEC double SDLCALL SDL_log(double x);
 extern DECLSPEC float SDLCALL SDL_logf(float x);
 extern DECLSPEC double SDLCALL SDL_log10(double x);
 extern DECLSPEC float SDLCALL SDL_log10f(float x);
+extern DECLSPEC double SDLCALL SDL_modf(double x, double *y);
+extern DECLSPEC float SDLCALL SDL_modff(float x, float *y);
 extern DECLSPEC double SDLCALL SDL_pow(double x, double y);
 extern DECLSPEC float SDLCALL SDL_powf(float x, float y);
 extern DECLSPEC double SDLCALL SDL_round(double x);
@@ -602,7 +604,7 @@ extern DECLSPEC float SDLCALL SDL_tanf(float x);
 #define SDL_ICONV_EINVAL    (size_t)-4
 
 /* SDL_iconv_* are now always real symbols/types, not macros or inlined. */
-typedef struct _SDL_iconv_t *SDL_iconv_t;
+typedef struct SDL_iconv_data_t *SDL_iconv_t;
 extern DECLSPEC SDL_iconv_t SDLCALL SDL_iconv_open(const char *tocode,
                                                    const char *fromcode);
 extern DECLSPEC int SDLCALL SDL_iconv_close(SDL_iconv_t cd);
@@ -694,17 +696,17 @@ SDL_FORCE_INLINE int SDL_size_mul_overflow (size_t a,
     return 0;
 }
 
-#if _SDL_HAS_BUILTIN(__builtin_mul_overflow)
+#if SDL_HAS_BUILTIN(__builtin_mul_overflow)
 /* This needs to be wrapped in an inline rather than being a direct #define,
  * because __builtin_mul_overflow() is type-generic, but we want to be
  * consistent about interpreting a and b as size_t. */
-SDL_FORCE_INLINE int _SDL_size_mul_overflow_builtin (size_t a,
+SDL_FORCE_INLINE int SDL_size_mul_overflow_builtin (size_t a,
                                                      size_t b,
                                                      size_t *ret)
 {
     return __builtin_mul_overflow(a, b, ret) == 0 ? 0 : -1;
 }
-#define SDL_size_mul_overflow(a, b, ret) (_SDL_size_mul_overflow_builtin(a, b, ret))
+#define SDL_size_mul_overflow(a, b, ret) (SDL_size_mul_overflow_builtin(a, b, ret))
 #endif
 
 /**
@@ -724,16 +726,16 @@ SDL_FORCE_INLINE int SDL_size_add_overflow (size_t a,
     return 0;
 }
 
-#if _SDL_HAS_BUILTIN(__builtin_add_overflow)
+#if SDL_HAS_BUILTIN(__builtin_add_overflow)
 /* This needs to be wrapped in an inline rather than being a direct #define,
  * the same as the call to __builtin_mul_overflow() above. */
-SDL_FORCE_INLINE int _SDL_size_add_overflow_builtin (size_t a,
+SDL_FORCE_INLINE int SDL_size_add_overflow_builtin (size_t a,
                                                      size_t b,
                                                      size_t *ret)
 {
     return __builtin_add_overflow(a, b, ret) == 0 ? 0 : -1;
 }
-#define SDL_size_add_overflow(a, b, ret) (_SDL_size_add_overflow_builtin(a, b, ret))
+#define SDL_size_add_overflow(a, b, ret) (SDL_size_add_overflow_builtin(a, b, ret))
 #endif
 
 /* Ends C function definitions when using C++ */
@@ -743,5 +745,3 @@ SDL_FORCE_INLINE int _SDL_size_add_overflow_builtin (size_t a,
 #include <SDL3/SDL_close_code.h>
 
 #endif /* SDL_stdinc_h_ */
-
-/* vi: set ts=4 sw=4 expandtab: */

@@ -95,7 +95,7 @@ void RWopsTearDown(void *arg)
  * http://wiki.libsdl.org/SDL_RWseek
  * http://wiki.libsdl.org/SDL_RWread
  */
-void _testGenericRWopsValidations(SDL_RWops *rw, int write)
+static void testGenericRWopsValidations(SDL_RWops *rw, int write)
 {
     char buf[sizeof(RWopsHelloWorldTestString)];
     Sint64 i;
@@ -242,7 +242,7 @@ int rwops_testMem(void)
     SDLTest_AssertCheck(rw->type == SDL_RWOPS_MEMORY, "Verify RWops type is SDL_RWOPS_MEMORY; expected: %d, got: %" SDL_PRIu32, SDL_RWOPS_MEMORY, rw->type);
 
     /* Run generic tests */
-    _testGenericRWopsValidations(rw, 1);
+    testGenericRWopsValidations(rw, 1);
 
     /* Close */
     result = SDL_RWclose(rw);
@@ -278,7 +278,7 @@ int rwops_testConstMem(void)
     SDLTest_AssertCheck(rw->type == SDL_RWOPS_MEMORY_RO, "Verify RWops type is SDL_RWOPS_MEMORY_RO; expected: %d, got: %" SDL_PRIu32, SDL_RWOPS_MEMORY_RO, rw->type);
 
     /* Run generic tests */
-    _testGenericRWopsValidations(rw, 0);
+    testGenericRWopsValidations(rw, 0);
 
     /* Close handle */
     result = SDL_RWclose(rw);
@@ -326,7 +326,7 @@ int rwops_testFileRead(void)
 #endif
 
     /* Run generic tests */
-    _testGenericRWopsValidations(rw, 0);
+    testGenericRWopsValidations(rw, 0);
 
     /* Close handle */
     result = SDL_RWclose(rw);
@@ -374,7 +374,7 @@ int rwops_testFileWrite(void)
 #endif
 
     /* Run generic tests */
-    _testGenericRWopsValidations(rw, 1);
+    testGenericRWopsValidations(rw, 1);
 
     /* Close handle */
     result = SDL_RWclose(rw);
@@ -387,15 +387,15 @@ int rwops_testFileWrite(void)
 /**
  * @brief Tests alloc and free RW context.
  *
- * \sa http://wiki.libsdl.org/SDL_AllocRW
- * \sa http://wiki.libsdl.org/SDL_FreeRW
+ * \sa http://wiki.libsdl.org/SDL_CreateRW
+ * \sa http://wiki.libsdl.org/SDL_DestroyRW
  */
 int rwops_testAllocFree(void)
 {
     /* Allocate context */
-    SDL_RWops *rw = SDL_AllocRW();
-    SDLTest_AssertPass("Call to SDL_AllocRW() succeeded");
-    SDLTest_AssertCheck(rw != NULL, "Validate result from SDL_AllocRW() is not NULL");
+    SDL_RWops *rw = SDL_CreateRW();
+    SDLTest_AssertPass("Call to SDL_CreateRW() succeeded");
+    SDLTest_AssertCheck(rw != NULL, "Validate result from SDL_CreateRW() is not NULL");
     if (rw == NULL) {
         return TEST_ABORTED;
     }
@@ -406,8 +406,8 @@ int rwops_testAllocFree(void)
         "Verify RWops type is SDL_RWOPS_UNKNOWN; expected: %d, got: %" SDL_PRIu32, SDL_RWOPS_UNKNOWN, rw->type);
 
     /* Free context again */
-    SDL_FreeRW(rw);
-    SDLTest_AssertPass("Call to SDL_FreeRW() succeeded");
+    SDL_DestroyRW(rw);
+    SDLTest_AssertPass("Call to SDL_DestroyRW() succeeded");
 
     return TEST_COMPLETED;
 }
@@ -650,5 +650,3 @@ SDLTest_TestSuiteReference rwopsTestSuite = {
     rwopsTests,
     RWopsTearDown
 };
-
-/* vi: set ts=4 sw=4 expandtab: */

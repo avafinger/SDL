@@ -75,7 +75,7 @@ void PSP_GL_UnloadLibrary(_THIS);
 SDL_GLContext PSP_GL_CreateContext(_THIS, SDL_Window *window);
 int PSP_GL_MakeCurrent(_THIS, SDL_Window *window, SDL_GLContext context);
 int PSP_GL_SetSwapInterval(_THIS, int interval);
-int PSP_GL_GetSwapInterval(_THIS);
+int PSP_GL_GetSwapInterval(_THIS, int *interval);
 int PSP_GL_SwapWindow(_THIS, SDL_Window *window);
 void PSP_GL_DeleteContext(_THIS, SDL_GLContext context);
 
@@ -86,5 +86,3 @@ void PSP_HideScreenKeyboard(_THIS, SDL_Window *window);
 SDL_bool PSP_IsScreenKeyboardShown(_THIS, SDL_Window *window);
 
 #endif /* SDL_pspvideo_h_ */
-
-/* vi: set ts=4 sw=4 expandtab: */

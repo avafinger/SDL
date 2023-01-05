@@ -76,7 +76,7 @@ extern SDL_GLContext Cocoa_GL_CreateContext(_THIS, SDL_Window *window);
 extern int Cocoa_GL_MakeCurrent(_THIS, SDL_Window *window,
                                 SDL_GLContext context);
 extern int Cocoa_GL_SetSwapInterval(_THIS, int interval);
-extern int Cocoa_GL_GetSwapInterval(_THIS);
+extern int Cocoa_GL_GetSwapInterval(_THIS, int *interval);
 extern int Cocoa_GL_SwapWindow(_THIS, SDL_Window *window);
 extern void Cocoa_GL_DeleteContext(_THIS, SDL_GLContext context);
 
@@ -87,5 +87,3 @@ extern void Cocoa_GL_DeleteContext(_THIS, SDL_GLContext context);
 #endif /* SDL_VIDEO_OPENGL_CGL */
 
 #endif /* SDL_cocoaopengl_h_ */
-
-/* vi: set ts=4 sw=4 expandtab: */

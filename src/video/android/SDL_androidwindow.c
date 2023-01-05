@@ -59,7 +59,6 @@ int Android_CreateWindow(_THIS, SDL_Window *window)
     window->h = Android_SurfaceHeight;
 
     window->flags &= ~SDL_WINDOW_HIDDEN;
-    window->flags |= SDL_WINDOW_SHOWN; /* only one window on Android */
 
     /* One window, it always has focus */
     SDL_SetMouseFocus(window);
@@ -213,5 +212,3 @@ int Android_GetWindowWMInfo(_THIS, SDL_Window *window, SDL_SysWMinfo *info)
 }
 
 #endif /* SDL_VIDEO_DRIVER_ANDROID */
-
-/* vi: set ts=4 sw=4 expandtab: */

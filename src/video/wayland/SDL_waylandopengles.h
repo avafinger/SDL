@@ -39,12 +39,10 @@ typedef struct SDL_PrivateGLESData
 extern int Wayland_GLES_LoadLibrary(_THIS, const char *path);
 extern SDL_GLContext Wayland_GLES_CreateContext(_THIS, SDL_Window *window);
 extern int Wayland_GLES_SetSwapInterval(_THIS, int interval);
-extern int Wayland_GLES_GetSwapInterval(_THIS);
+extern int Wayland_GLES_GetSwapInterval(_THIS, int *interval);
 extern int Wayland_GLES_SwapWindow(_THIS, SDL_Window *window);
 extern int Wayland_GLES_MakeCurrent(_THIS, SDL_Window *window, SDL_GLContext context);
 extern void Wayland_GLES_DeleteContext(_THIS, SDL_GLContext context);
 extern SDL_EGLSurface Wayland_GLES_GetEGLSurface(_THIS, SDL_Window *window);
 
 #endif /* SDL_waylandopengles_h_ */
-
-/* vi: set ts=4 sw=4 expandtab: */

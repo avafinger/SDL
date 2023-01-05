@@ -126,7 +126,7 @@ void RISCOS_PollMouse(_THIS)
     buttons = regs.r[2];
 
     if (mouse->x != x || mouse->y != y) {
-        SDL_SendMouseMotion(0, mouse->focus, mouse->mouseID, 0, x, y);
+        SDL_SendMouseMotion(0, mouse->focus, mouse->mouseID, 0, (float)x, (float)y);
     }
 
     if (driverdata->last_mouse_buttons != buttons) {
@@ -174,5 +174,3 @@ void RISCOS_QuitEvents(_THIS)
 }
 
 #endif /* SDL_VIDEO_DRIVER_RISCOS */
-
-/* vi: set ts=4 sw=4 expandtab: */

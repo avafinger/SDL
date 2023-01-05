@@ -20,11 +20,9 @@
 */
 #include "SDL_internal.h"
 
-#ifndef _SDL_offscreenvideo_h
-#define _SDL_offscreenvideo_h
+#ifndef SDL_offscreenvideo_h
+#define SDL_offscreenvideo_h
 
 #include "../SDL_sysvideo.h"
 
-#endif /* _SDL_offscreenvideo_h */
-
-/* vi: set ts=4 sw=4 expandtab: */
+#endif /* SDL_offscreenvideo_h */

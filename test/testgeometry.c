@@ -72,18 +72,18 @@ void loop()
 
         if (event.type == SDL_MOUSEMOTION) {
             if (event.motion.state) {
-                int xrel, yrel;
+                float xrel, yrel;
                 int window_w, window_h;
                 SDL_Window *window = SDL_GetWindowFromID(event.motion.windowID);
                 SDL_GetWindowSize(window, &window_w, &window_h);
                 xrel = event.motion.xrel;
                 yrel = event.motion.yrel;
-                if (event.motion.y < window_h / 2) {
+                if (event.motion.y < (float)window_h / 2.0f) {
                     angle += xrel;
                 } else {
                     angle -= xrel;
                 }
-                if (event.motion.x < window_w / 2) {
+                if (event.motion.x < (float)window_w / 2.0f) {
                     angle -= yrel;
                 } else {
                     angle += yrel;
@@ -110,7 +110,7 @@ void loop()
             int cx, cy;
 
             /* Query the sizes */
-            SDL_RenderGetViewport(renderer, &viewport);
+            SDL_GetRenderViewport(renderer, &viewport);
             SDL_zeroa(verts);
             cx = viewport.x + viewport.w / 2;
             cy = viewport.y + viewport.h / 2;
@@ -262,5 +262,3 @@ int main(int argc, char *argv[])
 
     return 0;
 }
-
-/* vi: set ts=4 sw=4 expandtab: */

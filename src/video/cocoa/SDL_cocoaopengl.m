@@ -467,11 +467,16 @@ int Cocoa_GL_SetSwapInterval(_THIS, int interval)
     }
 }
 
-int Cocoa_GL_GetSwapInterval(_THIS)
+int Cocoa_GL_GetSwapInterval(_THIS, int *interval)
 {
     @autoreleasepool {
         SDLOpenGLContext *nscontext = (__bridge SDLOpenGLContext *)SDL_GL_GetCurrentContext();
-        return nscontext ? SDL_AtomicGet(&nscontext->swapIntervalSetting) : 0;
+        if (nscontext) {
+            *interval = SDL_AtomicGet(&nscontext->swapIntervalSetting);
+            return 0;
+        } else {
+            return SDL_SetError("no OpenGL context");
+        }
     }
 }
 
@@ -526,5 +531,3 @@ void Cocoa_GL_DeleteContext(_THIS, SDL_GLContext context)
 #endif
 
 #endif /* SDL_VIDEO_OPENGL_CGL */
-
-/* vi: set ts=4 sw=4 expandtab: */
