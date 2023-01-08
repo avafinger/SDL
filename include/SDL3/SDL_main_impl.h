@@ -64,12 +64,20 @@ typedef wchar_t* PWSTR;
 /* This is where execution begins [console apps] */
 #if defined( UNICODE ) && UNICODE
 int wmain(int argc, wchar_t *wargv[], wchar_t *wenvp)
-#else /* ANSI */
-int main(int argc, char *argv[])
-#endif
 {
+    (void)argc;
+    (void)wargv;
+    (void)wenvp;
     return SDL_RunApp(0, NULL, SDL_main, NULL);
 }
+#else /* ANSI */
+int main(int argc, char *argv[])
+{
+    (void)argc;
+    (void)argv;
+    return SDL_RunApp(0, NULL, SDL_main, NULL);
+}
+#endif /* UNICODE */
 
 #endif /* _MSC_VER && ! __GDK__ */
 
@@ -80,6 +88,10 @@ int WINAPI wWinMain(HINSTANCE hInst, HINSTANCE hPrev, PWSTR szCmdLine, int sw)
 int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
 #endif
 {
+    (void)hInst;
+    (void)hPrev;
+    (void)szCmdLine;
+    (void)sw;
     return SDL_RunApp(0, NULL, SDL_main, NULL);
 }
 
